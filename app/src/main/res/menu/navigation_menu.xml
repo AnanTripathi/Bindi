@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:title="People"
+        android:id="@+id/nav_people"
+        android:icon="@drawable/ic_people"/>
+    <item android:title="Voice Messages"
+        android:id="@+id/nav_voice_mails"
+        android:icon="@drawable/ic_voice_mails"/>
+    <item android:title="Profile"
+        android:id="@+id/nav_profile"
+        android:icon="@drawable/ic_profile"/>
+
+</menu>
