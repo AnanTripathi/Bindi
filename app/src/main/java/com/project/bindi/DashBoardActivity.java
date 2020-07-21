@@ -5,14 +5,19 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class DashBoardActivity extends AppCompatActivity {
     ActionBar actionBar;
-
+    FirebaseAuth firebaseAuth;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,4 +64,43 @@ public class DashBoardActivity extends AppCompatActivity {
                     return false;
                 }
             };
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_logout, menu);
+        return true;
+    }
+
+
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        switch (item.getItemId()) {
+            case R.id.action_logout:
+                firebaseAuth.signOut();
+                checkUserStatus();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+
+        }
+    }
+    private void checkUserStatus(){
+        FirebaseUser user=firebaseAuth.getCurrentUser();
+        if(user!=null){
+            // profileTv.setText(user.getEmail());
+        }
+        else{
+            startActivity(new Intent(DashBoardActivity.this,LoginActivity.class));
+            finish();
+        }
+    }
+    @Override
+    public void onStart() {
+        super.onStart();
+        // Check if user is signed in (non-null) and update UI accordingly.
+        checkUserStatus();
+
+    }
 }

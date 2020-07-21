@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "80723307506",
+    "firebase_url": "https://bindi-dc664.firebaseio.com",
+    "project_id": "bindi-dc664",
+    "storage_bucket": "bindi-dc664.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:80723307506:android:45d1558380a009c498196b",
+        "android_client_info": {
+          "package_name": "com.project.bindi"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "80723307506-ivtecet88aj8q9oaorifb8lp66ehfbp5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.project.bindi",
+            "certificate_hash": "d48bbbecb16b87099ce0a03eba84c5917113efc3"
+          }
+        },
+        {
+          "client_id": "80723307506-qoplh5ag3a6aq2dh1rfv1bcbp5l87i7o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyADNXAnAltqMUnEigFYq0UymTmLk86e-e0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "80723307506-qoplh5ag3a6aq2dh1rfv1bcbp5l87i7o.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
