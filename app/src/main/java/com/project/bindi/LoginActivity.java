@@ -73,6 +73,10 @@ public class LoginActivity extends AppCompatActivity {
         mLoginBtn=findViewById(R.id.loginBtn);
         progressDialog=new ProgressDialog(this);
         progressDialog.setMessage("Logging In.....");
+        // Write a message to the database
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference myRef = database.getReference("message");
+        myRef.setValue("Hello, World!");
         mLoginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

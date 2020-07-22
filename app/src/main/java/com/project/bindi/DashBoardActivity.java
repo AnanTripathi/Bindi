@@ -10,19 +10,27 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class DashBoardActivity extends AppCompatActivity {
     ActionBar actionBar;
     FirebaseAuth firebaseAuth;
+    String Uid;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dash_board);
-
+        firebaseAuth=FirebaseAuth.getInstance();
+        checkUserStatus();
         actionBar=getSupportActionBar();
         actionBar.setTitle("People");
         BottomNavigationView bottomNavigationView=findViewById(R.id.navigation);
@@ -89,12 +97,35 @@ public class DashBoardActivity extends AppCompatActivity {
     private void checkUserStatus(){
         FirebaseUser user=firebaseAuth.getCurrentUser();
         if(user!=null){
-            // profileTv.setText(user.getEmail());
+            DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReference("Users");
+            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    for(DataSnapshot ds:snapshot.getChildren()){
+                        User u1=ds.getValue(User.class);
+                        boolean a=u1.getUid().equals(firebaseAuth.getUid());
+                        if(a){
+                            boolean b=u1.isProfileComplete();
+                            if(!b){
+                                Intent intent=new Intent(DashBoardActivity.this,UpdateUserActivity.class);
+                                startActivity(intent);
+                                finish();
+                            }
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
         }
         else{
             startActivity(new Intent(DashBoardActivity.this,LoginActivity.class));
             finish();
         }
+
     }
     @Override
     public void onStart() {
