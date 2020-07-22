@@ -19,6 +19,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 public class DashBoardActivity extends AppCompatActivity {
@@ -97,29 +98,10 @@ public class DashBoardActivity extends AppCompatActivity {
     private void checkUserStatus(){
         FirebaseUser user=firebaseAuth.getCurrentUser();
         if(user!=null){
-            DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReference("Users");
-            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    for(DataSnapshot ds:snapshot.getChildren()){
-                        User u1=ds.getValue(User.class);
-                        boolean a=u1.getUid().equals(firebaseAuth.getUid());
-                        if(a){
-                            boolean b=u1.isProfileComplete();
-                            if(!b){
-                                Intent intent=new Intent(DashBoardActivity.this,UpdateUserActivity.class);
-                                startActivity(intent);
-                                finish();
-                            }
-                        }
-                    }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-
-                }
-            });
+            if(user.getDisplayName().equals("false")){
+                startActivity(new Intent(DashBoardActivity.this,UpdateUserActivity.class));
+                finish();
+            }
         }
         else{
             startActivity(new Intent(DashBoardActivity.this,LoginActivity.class));

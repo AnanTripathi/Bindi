@@ -33,6 +33,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -223,11 +224,25 @@ public class LoginActivity extends AppCompatActivity {
                             if(task.getResult().getAdditionalUserInfo().isNewUser()){
                                 String email =user.getEmail();
                                 String uid=user.getUid();
+                                UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                                        .setDisplayName("false")
+                                        .build();
+
+                                user.updateProfile(profileUpdates)
+                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                if (task.isSuccessful()) {
+
+                                                }
+                                            }
+                                        });
                                 //store these in hashmap
                                 User u1=new User(uid,email,null,null,null,null,null);
                                 FirebaseDatabase database=FirebaseDatabase.getInstance();
                                 DatabaseReference reference=database.getReference("Users");
-                                reference.child(uid).setValue(u1);}
+                                reference.child(uid).setValue(u1);
+                            }
                             startActivity(new Intent(LoginActivity.this, UpdateUserActivity.class));
                             finish();
                         } else {
