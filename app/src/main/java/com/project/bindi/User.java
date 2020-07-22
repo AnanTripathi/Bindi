@@ -8,7 +8,9 @@ public class User {
     String description;
     String image;
     String Uid;
+    public User() {
 
+    }
 
     public boolean isProfileComplete(){
         if(name==null||email==null||age==null||gender==null||description==null||name.equals("")||email.equals("")||age.equals("")||gender.equals("")||description.equals("")){
@@ -84,6 +86,5 @@ public class User {
         Uid = uid;
     }
 
-    public User() {
-    }
+
 }

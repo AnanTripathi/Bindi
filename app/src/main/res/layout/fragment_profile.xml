@@ -29,7 +29,6 @@
         android:textSize="18sp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Hritik Roshan"
         android:textAlignment="center"
         android:layout_below="@id/name"/>
     <TextView
@@ -46,7 +45,6 @@
         android:textSize="18sp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="48"
         android:textAlignment="center"
         android:layout_below="@id/age"/>
     <TextView
@@ -63,7 +61,6 @@
         android:textSize="18sp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Male"
         android:textAlignment="center"
         android:layout_below="@id/gender"/>
 
@@ -82,7 +79,6 @@
         android:textSize="18sp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="A handsome Young man who like to got to gym"
         android:textAlignment="center"
         android:layout_below="@id/description"/>
    <com.google.android.material.floatingactionbutton.FloatingActionButton
