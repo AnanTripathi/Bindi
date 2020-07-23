@@ -13,7 +13,7 @@ public class User {
     }
 
     public boolean isProfileComplete(){
-        if(name==null||email==null||age==null||gender==null||description==null||name.equals("")||email.equals("")||age.equals("")||gender.equals("")||description.equals("")){
+        if(name==null||email==null||age==null||gender==null||description==null||name.equals("")||email.equals("")||age.equals("")||gender.equals("")||description.equals("")||image==null||image.equals("")){
             return false;
         }
         return true;

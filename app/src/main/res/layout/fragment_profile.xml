@@ -5,16 +5,30 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".ProfileFragment">
+
+    <FrameLayout
+    android:layout_marginTop="30dp"
+    android:layout_centerHorizontal="true"
+    android:id="@+id/profileIv"
+    android:layout_width="100dp"
+    android:layout_height="150dp">
+
     <ImageView
-        android:layout_marginTop="30dp"
-        android:layout_centerHorizontal="true"
-        android:id="@+id/profileIv"
-        android:layout_width="100dp"
-        android:layout_height="150dp"
+        android:id="@+id/profileImage"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
         android:background="@layout/image_border"
         android:padding="7dp"
         android:scaleType="fitXY"
-        android:src="@drawable/hritik" />
+        android:src="@drawable/ic_default_image" />
+    <ProgressBar
+        android:visibility="gone"
+        android:id="@+id/progressImage"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center" />
+
+</FrameLayout>
     <TextView
         android:paddingHorizontal="10dp"
         android:layout_alignParentStart="true"

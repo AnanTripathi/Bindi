@@ -9,9 +9,12 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -31,7 +34,9 @@ DatabaseReference userReference;
 FirebaseUser firebaseUser;
 FirebaseAuth firebaseAuth;
 User userdata;
-ProgressBar progressBar;
+ProgressBar progressBar,imageProgressBar;
+ImageView profileImageView;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -39,12 +44,15 @@ ProgressBar progressBar;
         View view=inflater.inflate(R.layout.fragment_profile, container, false);
         userReference= FirebaseDatabase.getInstance().getReference("Users");
         firebaseAuth=FirebaseAuth.getInstance();
+        profileImageView=view.findViewById(R.id.profileImage);
+        imageProgressBar=view.findViewById(R.id.progressImage);
         nameTv=view.findViewById(R.id.nameTv);
         progressBar=view.findViewById(R.id.indeterminateBar);
         ageTv=view.findViewById(R.id.ageTv);
         genderTv=view.findViewById(R.id.genderTv);
         descriptionTv=view.findViewById(R.id.descriptionTv);
         editFab=view.findViewById(R.id.editFab);
+        imageProgressBar.setVisibility(View.VISIBLE);
         editFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -58,12 +66,28 @@ ProgressBar progressBar;
 
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                userdata=snapshot.child(firebaseAuth.getUid()).getValue(User.class);
+                imageProgressBar.setVisibility(View.VISIBLE);
+                if(!(firebaseAuth.getUid()==null||firebaseAuth.getUid().equals(""))){
+                userdata=snapshot.child(firebaseAuth.getUid()).getValue(User.class);}
+                if(userdata.isProfileComplete()){
                 nameTv.setText(userdata.getName());
                 ageTv.setText(userdata.getAge());
                 genderTv.setText(userdata.getGender());
                 descriptionTv.setText(userdata.getDescription());
+            if(!(userdata.getImage()==null||userdata.getImage().equals(""))){
+                    try{
+                Glide.with(getContext())
+                .load(userdata.getImage())
+                .into(profileImageView);
+                imageProgressBar.setVisibility(View.GONE);
+                    }
+                catch (Exception ignored){
+                    imageProgressBar.setVisibility(View.GONE);
+                    }
+                }
+                }
                 progressBar.setVisibility(View.GONE);
+                imageProgressBar.setVisibility(View.GONE);
             }
 
             @Override

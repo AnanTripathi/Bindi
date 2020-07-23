@@ -75,9 +75,6 @@ public class LoginActivity extends AppCompatActivity {
         progressDialog=new ProgressDialog(this);
         progressDialog.setMessage("Logging In.....");
         // Write a message to the database
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference("message");
-        myRef.setValue("Hello, World!");
         mLoginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -221,6 +218,7 @@ public class LoginActivity extends AppCompatActivity {
                             FirebaseUser user = mAuth.getCurrentUser();
 
                             //if user is signed in for the first time
+                            try{
                             if(task.getResult().getAdditionalUserInfo().isNewUser()){
                                 String email =user.getEmail();
                                 String uid=user.getUid();
@@ -232,9 +230,7 @@ public class LoginActivity extends AppCompatActivity {
                                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
-                                                if (task.isSuccessful()) {
 
-                                                }
                                             }
                                         });
                                 //store these in hashmap
@@ -243,8 +239,10 @@ public class LoginActivity extends AppCompatActivity {
                                 DatabaseReference reference=database.getReference("Users");
                                 reference.child(uid).setValue(u1);
                             }
-                            startActivity(new Intent(LoginActivity.this, UpdateUserActivity.class));
-                            finish();
+                            startActivity(new Intent(LoginActivity.this, DashBoardActivity.class));
+                            finish();}catch(Exception ignored){
+                                Toast.makeText(LoginActivity.this, "there was error please try again", Toast.LENGTH_SHORT).show();
+                            }
                         } else {
                             Toast.makeText(LoginActivity.this, "Authentication Failed."+task.getException(), Toast.LENGTH_SHORT).show();
 

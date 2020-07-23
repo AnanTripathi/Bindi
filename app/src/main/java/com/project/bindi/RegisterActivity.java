@@ -39,7 +39,6 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
         mAuth = FirebaseAuth.getInstance();
-
         ActionBar actionBar=getSupportActionBar();
         actionBar.setTitle("Create Account");
         actionBar.setDisplayHomeAsUpEnabled(true);// go back to single level
@@ -88,34 +87,38 @@ public class RegisterActivity extends AppCompatActivity {
                             // Sign in success, update UI with the signed-in user's information
                             progressDialog.dismiss();
                             FirebaseUser user = mAuth.getCurrentUser();
+                            try {
+                                UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                                        .setDisplayName("false")
+                                        .build();
 
-                            UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                                    .setDisplayName("false")
-                                    .build();
+                                user.updateProfile(profileUpdates)
+                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                if (task.isSuccessful()) {
 
-                            user.updateProfile(profileUpdates)
-                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
-                                            if (task.isSuccessful()) {
-
+                                                }
                                             }
-                                        }
-                                    });
-                            //get user email and uid from auth
-                            String email =user.getEmail();
-                            String uid=user.getUid();
-                            //store these in hashmap
-                            User u1=new User(uid,email,null,null,null,null,null);
-                            FirebaseDatabase database=FirebaseDatabase.getInstance();
-                            DatabaseReference reference=database.getReference("Users");
-                            reference.child(uid).setValue(u1);
+                                        });
 
-                            Toast.makeText(RegisterActivity.this,"Registered..\n"+user.getEmail(),Toast.LENGTH_SHORT).show();
-                            startActivity(new Intent(RegisterActivity.this, UpdateUserActivity.class));
-                            Toast.makeText(RegisterActivity.this, "hello", Toast.LENGTH_SHORT).show();
-                            finish();
-                        } else {
+                                //get user email and uid from auth
+                                String email = user.getEmail();
+                                String uid = user.getUid();
+                                //store these in hashmap
+                                User u1 = new User(uid, email, null, null, null, null, null);
+                                FirebaseDatabase database = FirebaseDatabase.getInstance();
+                                DatabaseReference reference = database.getReference("Users");
+                                reference.child(uid).setValue(u1);
+
+                                Toast.makeText(RegisterActivity.this, "Registered..\n" + user.getEmail(), Toast.LENGTH_SHORT).show();
+                                startActivity(new Intent(RegisterActivity.this, UpdateUserActivity.class));
+                                Toast.makeText(RegisterActivity.this, "hello", Toast.LENGTH_SHORT).show();
+                                finish();
+                            }catch(Exception ignore){
+                                Toast.makeText(RegisterActivity.this, "some internet error", Toast.LENGTH_SHORT).show();
+                            }
+                            } else {
                             // If sign in fails, display a message to the user
                             progressDialog.dismiss();
                             Toast.makeText(RegisterActivity.this, "Authentication failed.",
