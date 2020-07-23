@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -29,6 +30,8 @@ TextView nameTv,ageTv,genderTv,descriptionTv;
 DatabaseReference userReference;
 FirebaseUser firebaseUser;
 FirebaseAuth firebaseAuth;
+User userdata;
+ProgressBar progressBar;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -37,6 +40,7 @@ FirebaseAuth firebaseAuth;
         userReference= FirebaseDatabase.getInstance().getReference("Users");
         firebaseAuth=FirebaseAuth.getInstance();
         nameTv=view.findViewById(R.id.nameTv);
+        progressBar=view.findViewById(R.id.indeterminateBar);
         ageTv=view.findViewById(R.id.ageTv);
         genderTv=view.findViewById(R.id.genderTv);
         descriptionTv=view.findViewById(R.id.descriptionTv);
@@ -54,11 +58,12 @@ FirebaseAuth firebaseAuth;
 
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                User user=snapshot.child(firebaseAuth.getUid()).getValue(User.class);
-                nameTv.setText(user.getName());
-                ageTv.setText(user.getAge());
-                genderTv.setText(user.getGender());
-                descriptionTv.setText(user.getDescription());
+                userdata=snapshot.child(firebaseAuth.getUid()).getValue(User.class);
+                nameTv.setText(userdata.getName());
+                ageTv.setText(userdata.getAge());
+                genderTv.setText(userdata.getGender());
+                descriptionTv.setText(userdata.getDescription());
+                progressBar.setVisibility(View.GONE);
             }
 
             @Override

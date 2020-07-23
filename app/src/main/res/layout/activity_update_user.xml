@@ -5,6 +5,8 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".UpdateUserActivity">
+
+
     <ImageView
         android:layout_marginTop="30dp"
         android:layout_centerHorizontal="true"
@@ -147,4 +149,10 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"/>
+    <ProgressBar
+        android:layout_marginHorizontal="30dp"
+        android:id="@+id/indeterminateBar"
+        android:layout_centerInParent="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 </RelativeLayout>
