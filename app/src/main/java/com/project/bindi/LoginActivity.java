@@ -28,6 +28,7 @@ import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -43,8 +44,8 @@ public class LoginActivity extends AppCompatActivity {
     private static final int RC_SIGN_IN = 100;
     private static final String TAG = "LoginActivity";
     EditText mEmailEt,mPasswordEt;
-    TextView notHaveAccntTv,forgotPassTv;
     Button mLoginBtn;
+    MaterialButton notHaveAccntMb,forgotPassMb;
     private FirebaseAuth mAuth;
     ProgressDialog progressDialog;
     SignInButton googleSignInButton;
@@ -54,9 +55,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         ActionBar actionBar=getSupportActionBar();
-        actionBar.setTitle("Create Account");
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setDisplayShowHomeEnabled(true);
+        actionBar.hide();
         // Configure Google Sign In before mAuth
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
@@ -65,12 +64,12 @@ public class LoginActivity extends AppCompatActivity {
         mGoogleSignInClient= GoogleSignIn.getClient(this,gso);
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
-        forgotPassTv=findViewById(R.id.forgot_passTv);
+        forgotPassMb=findViewById(R.id.forgot_passMb);
         googleSignInButton=findViewById(R.id.sign_in_button);
         googleSignInButton.setSize(SignInButton.SIZE_STANDARD);
         mEmailEt=findViewById(R.id.emailEt);
         mPasswordEt=findViewById(R.id.passwordEt);
-        notHaveAccntTv=findViewById(R.id.dont_have_accountTv);
+        notHaveAccntMb=findViewById(R.id.dont_have_accountMb);
         mLoginBtn=findViewById(R.id.loginBtn);
         progressDialog=new ProgressDialog(this);
         progressDialog.setMessage("Logging In.....");
@@ -89,14 +88,14 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         });
-        notHaveAccntTv.setOnClickListener(new View.OnClickListener() {
+        notHaveAccntMb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(LoginActivity.this,RegisterActivity.class));
                 finish();
             }
         });
-        forgotPassTv.setOnClickListener(new View.OnClickListener() {
+        forgotPassMb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showRecoverPasswordDialog();
@@ -234,7 +233,7 @@ public class LoginActivity extends AppCompatActivity {
                                             }
                                         });
                                 //store these in hashmap
-                                User u1=new User(uid,email,null,null,null,null,null);
+                                User u1=new User(uid,email,null,null,null,null,null,null);
                                 FirebaseDatabase database=FirebaseDatabase.getInstance();
                                 DatabaseReference reference=database.getReference("Users");
                                 reference.child(uid).setValue(u1);

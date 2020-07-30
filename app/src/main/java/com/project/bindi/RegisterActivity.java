@@ -18,6 +18,7 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -32,7 +33,7 @@ public class RegisterActivity extends AppCompatActivity {
     Button mRegisterBtn;
     ProgressDialog progressDialog;
     private FirebaseAuth mAuth;
-    TextView haveAccountTv;
+    MaterialButton haveAccountMb;
     FirebaseDatabase database;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,13 +41,11 @@ public class RegisterActivity extends AppCompatActivity {
         setContentView(R.layout.activity_register);
         mAuth = FirebaseAuth.getInstance();
         ActionBar actionBar=getSupportActionBar();
-        actionBar.setTitle("Create Account");
-        actionBar.setDisplayHomeAsUpEnabled(true);// go back to single level
-        actionBar.setDisplayShowHomeEnabled(true);
+        actionBar.hide();
         mEmailEt=findViewById(R.id.emailEt);
         mPasswordEt=findViewById(R.id.passwordEt);
         mRegisterBtn=findViewById(R.id.registerBtn);
-        haveAccountTv=findViewById(R.id.have_accoutTv);
+        haveAccountMb=findViewById(R.id.have_accoutMb);
         progressDialog=new ProgressDialog(this);
         progressDialog.setMessage("Registering user.. ");
 
@@ -68,7 +67,7 @@ public class RegisterActivity extends AppCompatActivity {
                 }
             }
         });
-        haveAccountTv.setOnClickListener(new View.OnClickListener() {
+        haveAccountMb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(RegisterActivity.this,LoginActivity.class));
@@ -106,7 +105,7 @@ public class RegisterActivity extends AppCompatActivity {
                                 String email = user.getEmail();
                                 String uid = user.getUid();
                                 //store these in hashmap
-                                User u1 = new User(uid, email, null, null, null, null, null);
+                                User u1 = new User(uid, email, null, null, null, null, null,null);
                                 FirebaseDatabase database = FirebaseDatabase.getInstance();
                                 DatabaseReference reference = database.getReference("Users");
                                 reference.child(uid).setValue(u1);

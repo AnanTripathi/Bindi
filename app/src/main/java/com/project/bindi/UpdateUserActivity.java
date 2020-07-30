@@ -11,6 +11,8 @@ import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.media.AudioAttributes;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -33,6 +35,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
@@ -43,9 +46,11 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.IOException;
 import java.util.HashMap;
 
 public class UpdateUserActivity extends AppCompatActivity {
@@ -74,13 +79,17 @@ public class UpdateUserActivity extends AppCompatActivity {
     String cameraPermission[];
     String storagePermission[];
     Uri image_uri;
-
+    Button editVoiceButton;
+    String voiceUri="";
+    FloatingActionButton playVoiceButton;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_update_user);
         imageView=findViewById(R.id.profileImage);
+        playVoiceButton=findViewById(R.id.play_voiceButton);
         imageProgressBar=findViewById(R.id.progressImage);
+        editVoiceButton=findViewById(R.id.editVoiceButton);
         usersDatabaseReference = FirebaseDatabase.getInstance().getReference("Users");
         storageReference = FirebaseStorage.getInstance().getReference();
         cameraPermission = new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
@@ -95,6 +104,13 @@ public class UpdateUserActivity extends AppCompatActivity {
         genderSpinner = (Spinner) findViewById(R.id.gender_spinner);
         save = findViewById(R.id.save);
         save.setEnabled(false);
+        editVoiceButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(UpdateUserActivity.this,MainActivity2.class));
+
+            }
+        });
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.gender_array, android.R.layout.simple_spinner_item);
 // Specify the layout to use when the list of choices appears
@@ -131,7 +147,7 @@ public class UpdateUserActivity extends AppCompatActivity {
                     imageProgressBar.setVisibility(View.GONE);
                     Toast.makeText(UpdateUserActivity.this, "Please fill all the details", Toast.LENGTH_SHORT).show();
                 } else {
-                    userdata = new User(firebaseUser.getUid(), firebaseUser.getEmail(), name, age, gender, description, imageUri);
+                    userdata = new User(firebaseUser.getUid(), firebaseUser.getEmail(), name, age, gender, description, imageUri,voiceUri);
                     usersDatabaseReference.child(firebaseUser.getUid()).setValue(userdata);
                     if (userdata.isProfileComplete()) {
                         UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
@@ -169,12 +185,14 @@ public class UpdateUserActivity extends AppCompatActivity {
             }
         });
         final Query userQuery = usersDatabaseReference.orderByChild("uid").equalTo(firebaseAuth.getUid());
-        userQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+        userQuery.addValueEventListener(new ValueEventListener() {
 
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 userdata = snapshot.child(firebaseAuth.getUid()).getValue(User.class);
+                voiceUri=userdata.getAudio();
                 if (userdata.isProfileComplete()) {
+
                     imageProgressBar.setVisibility(View.VISIBLE);
                     nameEt.setText(userdata.getName());
                     ageEt.setText(userdata.getAge());
@@ -211,6 +229,31 @@ public class UpdateUserActivity extends AppCompatActivity {
                 showImagePicDialog();
             }
         });
+        playVoiceButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Uri myUri = Uri.parse(userdata.getAudio()); // initialize Uri here
+                MediaPlayer mediaPlayer = new MediaPlayer();
+                mediaPlayer.setAudioAttributes(
+                        new AudioAttributes.Builder()
+                                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                                .setUsage(AudioAttributes.USAGE_MEDIA)
+                                .build()
+                );
+                try {
+                    mediaPlayer.setDataSource(getApplicationContext(), myUri);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    mediaPlayer.prepare();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                mediaPlayer.start();
+
+            }
+        });
     }
 
 
@@ -239,7 +282,7 @@ public class UpdateUserActivity extends AppCompatActivity {
     private void checkUserStatus() {
         FirebaseUser user = firebaseAuth.getCurrentUser();
         if (user != null) {
-            // profileTv.setText(user.getEmail());
+
         } else {
             startActivity(new Intent(UpdateUserActivity.this, LoginActivity.class));
             finish();
@@ -370,8 +413,7 @@ public class UpdateUserActivity extends AppCompatActivity {
     private void uploadProfilePhoto(final Uri uri) {
         String filePathAndName=storagePath+"profile_"+userdata.getUid();
         StorageReference storageReference2nd=storageReference.child(filePathAndName);
-        storageReference2nd.putFile(uri)
-                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+        storageReference2nd.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                         Task<Uri> uriTask=taskSnapshot.getStorage().getDownloadUrl();

@@ -1,10 +1,56 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light.DarkActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
+    <style parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox" name="Widget.Bindi.TextInputLayout">
 
+    <item name="hintTextAppearance">@style/TextAppearance.Bindi.TextInputLayout.HintText</item>
+
+    <item name="hintTextColor">@color/textColorPrimary</item>
+
+    <item name="android:paddingBottom">8dp</item>
+
+    <item name="boxStrokeColor">@color/textInputOutlineColor</item>
+
+</style>
+
+    <style parent="TextAppearance.MaterialComponents.Subtitle2" name="TextAppearance.Bindi.TextInputLayout.HintText">
+
+    <item name="android:textColor">?android:attr/textColorPrimary</item>
+
+</style>
+
+
+    <style parent="Widget.MaterialComponents.Button" name="Widget.Bindi.Button">
+
+    <item name="android:textColor">?android:attr/textColorPrimary</item>
+
+    <item name="backgroundTint">?attr/colorAccent</item>
+
+
+</style>
+
+
+    <style parent="Widget.MaterialComponents.Button.TextButton" name="Widget.Bindi.Button.TextButton">
+
+    <item name="android:textColor">?android:attr/textColorPrimary</item>
+
+</style>
+    <style name="Theme.Bindi" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:textColorPrimary">@color/textColorPrimary</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="n">true</item>
+    </style>
+    <style name="Widget.Shrine.Toolbar" parent="Widget.AppCompat.Toolbar">
+        <item name="android:background">?attr/colorAccent</item>
+        <item name="android:theme">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
+        <item name="popupTheme">@style/ThemeOverlay.AppCompat.Light</item>
+    </style>
 </resources>

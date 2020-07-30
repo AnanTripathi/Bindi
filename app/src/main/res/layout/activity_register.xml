@@ -1,22 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="20dp"
+
     tools:context=".RegisterActivity">
-    <TextView
-        android:text="Register"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:textAlignment="center"
-        android:textColor="@color/colorBlack"
-        android:textSize="25dp"/>
-    <com.google.android.material.textfield.TextInputLayout
+        <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
+        android:orientation="vertical">
+            <ImageView
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@mipmap/ic_launcher_bindi"
+                android:layout_margin="20dp"/>
+        <TextView
+            android:text="Register"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:textColor="@color/colorBlack"
+            android:layout_margin="20dp"
+            android:textSize="25dp"/>
+    <RelativeLayout
+        android:padding="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        style="@style/Widget.Bindi.TextInputLayout"
+        android:layout_height="wrap_content"
         android:id="@+id/emailTIL">
         <EditText
             android:id="@+id/emailEt"
@@ -29,9 +45,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/passwordTIL"
+        android:layout_below="@id/emailTIL"
+        style="@style/Widget.Bindi.TextInputLayout"
         app:passwordToggleEnabled="true"
-        app:passwordToggleContentDescription="hello"
-        android:layout_below="@id/emailTIL">
+        app:passwordToggleContentDescription="hello">
         <EditText
             android:id="@+id/passwordEt"
             android:inputType="textPassword"
@@ -42,20 +59,24 @@
     <Button
         android:id="@+id/registerBtn"
         android:text="Register"
-        android:layout_centerHorizontal="true"
+        android:drawableLeft="@drawable/ic_register_dark"
         android:layout_below="@id/passwordTIL"
-        style="@style/Base.Widget.AppCompat.Button.Colored"
+        android:layout_centerHorizontal="true"
+        style="@style/Widget.Bindi.Button"
+        android:layout_margin="20dp"
         android:layout_width="wrap_content"
-        android:drawableLeft="@drawable/ic_baseline_account_box"
         android:layout_height="wrap_content"/>
-    <TextView
-        android:layout_width="match_parent"
+    <com.google.android.material.button.MaterialButton
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="wrap_content"
         android:layout_marginTop="30dp"
+        android:layout_centerHorizontal="true"
         android:textColor="@color/colorBlack"
         android:layout_height="wrap_content"
-        android:textAlignment="center"
-        android:id="@+id/have_accoutTv"
+        android:id="@+id/have_accoutMb"
         android:layout_below="@id/registerBtn"
         android:text="Already have an account? login"
         android:clickable="true"/>
-</RelativeLayout>
+    </RelativeLayout>
+    </LinearLayout>
+</ScrollView>

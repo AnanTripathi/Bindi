@@ -31,6 +31,7 @@ public class DashBoardActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dash_board);
         firebaseAuth=FirebaseAuth.getInstance();
+
         checkUserStatus();
         actionBar=getSupportActionBar();
         actionBar.setTitle("People");

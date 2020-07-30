@@ -1,34 +1,47 @@
 package com.project.bindi;
 
 public class User {
-    String name;
+    String Uid;
     String email;
+    String name;
+
     String age;
     String gender;
     String description;
     String image;
-    String Uid;
+
+    String audio;
+
+    public User(String uid, String email, String name, String age, String gender, String description, String image, String audio) {
+        Uid = uid;
+        this.email = email;
+        this.name = name;
+        this.age = age;
+        this.gender = gender;
+        this.description = description;
+        this.image = image;
+        this.audio = audio;
+    }
+
+    public String getAudio() {
+        return audio;
+    }
+
+    public void setAudio(String audio) {
+        this.audio = audio;
+    }
+
     public User() {
 
     }
 
     public boolean isProfileComplete(){
-        if(name==null||email==null||age==null||gender==null||description==null||name.equals("")||email.equals("")||age.equals("")||gender.equals("")||description.equals("")||image==null||image.equals("")){
+        if(audio==null||name==null||email==null||age==null||gender==null||description==null||name.equals("")||email.equals("")||age.equals("")||gender.equals("")||description.equals("")||image==null||image.equals("")||audio.equals("")){
             return false;
         }
         return true;
     }
 
-
-    public User( String uid, String email,String name, String age, String gender, String description, String image) {
-        this.name = name;
-        this.email = email;
-        this.age = age;
-        this.gender = gender;
-        this.description = description;
-        this.image = image;
-        Uid = uid;
-    }
 
     public String getName() {
         return name;
