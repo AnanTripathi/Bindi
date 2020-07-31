@@ -4,4 +4,9 @@
         <item>Male</item>
         <item>Female</item>
     </string-array>
+    <string-array name="interestedin_array">
+        <item>Male</item>
+        <item>Female</item>
+        <item>Both</item>
+    </string-array>
 </resources>

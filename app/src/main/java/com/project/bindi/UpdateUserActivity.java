@@ -54,8 +54,8 @@ import java.io.IOException;
 import java.util.HashMap;
 
 public class UpdateUserActivity extends AppCompatActivity {
-    Spinner genderSpinner;
-    String gender;
+    Spinner genderSpinner,interestedInSpinner;
+    String gender,interestedIn;
     FirebaseAuth firebaseAuth;
     EditText nameEt, ageEt, descriptionEt;
     Button save, editProfileImageBn;
@@ -102,6 +102,7 @@ public class UpdateUserActivity extends AppCompatActivity {
         ageEt = findViewById(R.id.ageEt);
         descriptionEt = findViewById(R.id.descriptionEt);
         genderSpinner = (Spinner) findViewById(R.id.gender_spinner);
+        interestedInSpinner=(Spinner) findViewById(R.id.interestedin_spinner);
         save = findViewById(R.id.save);
         save.setEnabled(false);
         editVoiceButton.setOnClickListener(new View.OnClickListener() {
@@ -111,10 +112,13 @@ public class UpdateUserActivity extends AppCompatActivity {
 
             }
         });
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+        ArrayAdapter<CharSequence> genderadapter = ArrayAdapter.createFromResource(this,
                 R.array.gender_array, android.R.layout.simple_spinner_item);
+        ArrayAdapter<CharSequence> interestedinadapter = ArrayAdapter.createFromResource(this,
+                R.array.interestedin_array, android.R.layout.simple_spinner_item);
 // Specify the layout to use when the list of choices appears
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        interestedinadapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        genderadapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         genderSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -130,8 +134,26 @@ public class UpdateUserActivity extends AppCompatActivity {
                 gender = "Male";
             }
         });
+        interestedInSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (position == 0) {
+                    interestedIn = "Male";
+                } else if(position==1){
+                    interestedIn = "Female";
+                } else{
+                    interestedIn ="Both";
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                interestedIn = "Male";
+            }
+        });
 // Apply the adapter to the spinner
-        genderSpinner.setAdapter(adapter);
+        genderSpinner.setAdapter(genderadapter);
+        interestedInSpinner.setAdapter(interestedinadapter);
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -147,7 +169,7 @@ public class UpdateUserActivity extends AppCompatActivity {
                     imageProgressBar.setVisibility(View.GONE);
                     Toast.makeText(UpdateUserActivity.this, "Please fill all the details", Toast.LENGTH_SHORT).show();
                 } else {
-                    userdata = new User(firebaseUser.getUid(), firebaseUser.getEmail(), name, age, gender, description, imageUri,voiceUri);
+                    userdata =new User(firebaseUser.getUid(), firebaseUser.getEmail(), name, age, gender, description,interestedIn, imageUri,voiceUri,0);
                     usersDatabaseReference.child(firebaseUser.getUid()).setValue(userdata);
                     if (userdata.isProfileComplete()) {
                         UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()

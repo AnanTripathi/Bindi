@@ -2,26 +2,51 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="match_parent">
+<ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+<RelativeLayout
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     tools:context=".UpdateUserActivity">
 
     <FrameLayout
         android:layout_marginTop="30dp"
+        android:layout_marginHorizontal="40dp"
         android:layout_centerHorizontal="true"
         android:id="@+id/profileIv"
-        android:layout_width="100dp"
-        android:layout_height="150dp">
-
+        android:layout_width="match_parent"
+        android:layout_height="350dp">
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:cardCornerRadius="6dp"
+        android:elevation="10dp">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
     <ImageView
         android:id="@+id/profileImage"
         android:layout_height="match_parent"
         android:layout_width="match_parent"
-        android:background="@layout/image_border"
-        android:padding="7dp"
         android:scaleType="fitXY"
         android:src="@drawable/ic_default_image" />
+        <Button
+            android:id="@+id/editprofileImageBn"
+            android:text="edit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_margin="10dp"
+            />
+        </RelativeLayout>
+
+    </androidx.cardview.widget.CardView>
         <ProgressBar
             android:visibility="gone"
             android:id="@+id/progressImage"
@@ -30,14 +55,7 @@
             android:layout_gravity="center" />
 
     </FrameLayout>
-    <Button
-        android:id="@+id/editprofileImageBn"
-        android:text="edit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toEndOf="@id/profileIv"
-        android:layout_alignBottom="@id/profileIv"
-        />
+
     <LinearLayout
         android:id="@+id/nameLl"
         android:layout_below="@id/profileIv"
@@ -110,27 +128,28 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
     </LinearLayout>
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:layout_width="wrap_content"
+
+    <LinearLayout
+        android:id="@+id/intersetedInLl"
+        android:layout_below="@id/genderLl"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_play"
-        android:background="@null"
-        android:id="@+id/play_voiceButton"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentBottom="true"
-        android:layout_margin="20dp"/>
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_edit"
-        android:id="@+id/editVoiceButton"
-        android:text="Edit Voice"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_margin="20dp"/>
+        android:layout_margin="10dp"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Interested in:"
+            android:textSize="19dp"
+            android:textColor="#000000"/>
+        <Spinner
+            android:id="@+id/interestedin_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
     <LinearLayout
         android:id="@+id/descriptionLl"
-        android:layout_below="@id/genderLl"
+        android:layout_below="@id/intersetedInLl"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
@@ -158,7 +177,26 @@
                 android:hint="description......"/>
         </com.google.android.material.textfield.TextInputLayout>
     </LinearLayout>
+
+    <ProgressBar
+        android:layout_marginHorizontal="30dp"
+        android:id="@+id/indeterminateBar"
+        android:layout_centerInParent="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+</RelativeLayout>
+</ScrollView>
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_play"
+        android:background="@null"
+        android:id="@+id/play_voiceButton"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="20dp"/>
     <Button
+        android:elevation="6dp"
         android:text="save"
         android:id="@+id/save"
         android:layout_margin="20dp"
@@ -166,10 +204,14 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"/>
-    <ProgressBar
-        android:layout_marginHorizontal="30dp"
-        android:id="@+id/indeterminateBar"
-        android:layout_centerInParent="true"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+    <Button
+        android:elevation="6dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_edit"
+        android:id="@+id/editVoiceButton"
+        android:text="Edit Voice"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="20dp"/>
 </RelativeLayout>

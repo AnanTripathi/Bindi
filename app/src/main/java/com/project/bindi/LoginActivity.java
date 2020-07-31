@@ -233,7 +233,7 @@ public class LoginActivity extends AppCompatActivity {
                                             }
                                         });
                                 //store these in hashmap
-                                User u1=new User(uid,email,null,null,null,null,null,null);
+                                User u1=new User(uid,email,null,null,null,null,null,null,null,null);
                                 FirebaseDatabase database=FirebaseDatabase.getInstance();
                                 DatabaseReference reference=database.getReference("Users");
                                 reference.child(uid).setValue(u1);

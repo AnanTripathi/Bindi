@@ -21,6 +21,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -39,6 +41,7 @@ import com.yuyakaido.android.cardstackview.SwipeableMethod;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 public class PeopleFragment extends Fragment {
@@ -53,11 +56,13 @@ public class PeopleFragment extends Fragment {
     private static final String TAG = PeopleFragment.class.getSimpleName();
     private CardStackLayoutManager manager;
     private CardStackAdapter adapter;
+    DatabaseReference usersDatabaseReference;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         final View view=inflater.inflate(R.layout.fragment_people, container, false);
+        usersDatabaseReference=FirebaseDatabase.getInstance().getReference("Users");
         rewindFab=view.findViewById(R.id.lastFab);
         likeFab=view.findViewById(R.id.likeFab);
         doubleLikeFab=view.findViewById(R.id.doubleLikeFab);
@@ -67,17 +72,16 @@ public class PeopleFragment extends Fragment {
         doubleLikeFab.setEnabled(false);
         rewindFab.setEnabled(false);
         allUserInfo = new ArrayList<>();
-
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users");
         final FirebaseUser Firebaseuser = FirebaseAuth.getInstance().getCurrentUser();
-        ref.addValueEventListener(new ValueEventListener() {
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 allUserInfo.clear();
                 for(DataSnapshot ds: snapshot.getChildren())
                 {
                     User user1=ds.getValue(User.class);
-                    if(!user1.getUid().equals(Firebaseuser.getUid()))
+                    if(!(user1.getUid().equals(Firebaseuser.getUid())))
                     {
                         allUserInfo.add(user1);
                         if(allUserInfo.size()==1){
@@ -134,11 +138,12 @@ public class PeopleFragment extends Fragment {
             @Override
             public void onCardSwiped(Direction direction) {
                 Log.d(TAG, "onCardSwiped: p=" + manager.getTopPosition() + " d=" + direction);
-                if (direction == Direction.Right){
-                    Toast.makeText(getContext(), "Direction Right", Toast.LENGTH_SHORT).show();
+                if (direction == Direction.Right) {
+                    likeThePerson();
                 }
 
                 if (direction == Direction.Left){
+                    dislikeThePerson();
                     Toast.makeText(getContext(), "Direction Left", Toast.LENGTH_SHORT).show();
                 }
 
@@ -148,6 +153,7 @@ public class PeopleFragment extends Fragment {
 //                }
 
             }
+
 
             @Override
             public void onCardRewound() {
@@ -182,8 +188,8 @@ public class PeopleFragment extends Fragment {
         directions.add(Direction.Right);
         directions.add(Direction.Left);
         manager.setDirections(directions);
-        manager.setCanScrollHorizontal(true);
-        manager.setCanScrollVertical(true);
+//        manager.setCanScrollHorizontal(true);
+//        manager.setCanScrollVertical(true);
         manager.setSwipeableMethod(SwipeableMethod.AutomaticAndManual);
 
         manager.setOverlayInterpolator(new LinearInterpolator());
@@ -191,6 +197,35 @@ public class PeopleFragment extends Fragment {
         cardStackView.setLayoutManager(manager);
         cardStackView.setAdapter(adapter);
         cardStackView.setItemAnimator(new DefaultItemAnimator());
+
+    }
+
+    private void dislikeThePerson() {
+        final int topPosition=manager.getTopPosition()-1;
+        allUserInfo.get(topPosition).decreaseLikes();
+        HashMap<String, Object> results = new HashMap<>();
+        results.put("likes", allUserInfo.get(topPosition).getLikes());
+        usersDatabaseReference.child(allUserInfo.get(topPosition).getUid()).updateChildren(results)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Toast.makeText(getActivity(), "you disliked" + allUserInfo.get(topPosition).getName(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private void likeThePerson() {
+        final int topPosition=manager.getTopPosition()-1;
+        allUserInfo.get(topPosition).increaseLikes();
+        HashMap<String, Object> results = new HashMap<>();
+        results.put("likes", allUserInfo.get(topPosition).getLikes());
+        usersDatabaseReference.child(allUserInfo.get(topPosition).getUid()).updateChildren(results).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Toast.makeText(getActivity(), "you liked the person", Toast.LENGTH_SHORT).show();
+            }
+        });
+
 
     }
 

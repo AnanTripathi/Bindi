@@ -5,23 +5,58 @@ public class User {
     String email;
     String name;
 
-    String age;
-    String gender;
-    String description;
-    String image;
-
-    String audio;
-
-    public User(String uid, String email, String name, String age, String gender, String description, String image, String audio) {
+    public User(String uid, String email, String name, String age, String gender, String description, String interestedin, String image, String audio, Integer likes) {
         Uid = uid;
         this.email = email;
         this.name = name;
         this.age = age;
         this.gender = gender;
         this.description = description;
+        this.interestedin = interestedin;
         this.image = image;
         this.audio = audio;
+        this.likes = likes;
     }
+
+    public String getInterestedin() {
+        return interestedin;
+    }
+
+    public void setInterestedin(String interestedin) {
+        this.interestedin = interestedin;
+    }
+
+    public Integer getLikes() {
+        return likes;
+    }
+    public void increaseLikes(){
+        likes++;
+    }
+    public void decreaseLikes(){
+        likes--;
+    }
+    public void setLikes(Integer likes) {
+        this.likes = likes;
+    }
+
+    String age;
+    String gender;
+    String description;
+    String interestedin;
+    String image;
+    String audio;
+    Integer likes;
+
+//    public User(String uid, String email, String name, String age, String gender, String description, String image, String audio) {
+//        Uid = uid;
+//        this.email = email;
+//        this.name = name;
+//        this.age = age;
+//        this.gender = gender;
+//        this.description = description;
+//        this.image = image;
+//        this.audio = audio;
+//    }
 
     public String getAudio() {
         return audio;
