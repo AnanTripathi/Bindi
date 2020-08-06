@@ -170,7 +170,15 @@ public class LoginActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             progressDialog.dismiss();
                             FirebaseUser user = mAuth.getCurrentUser();
-                            startActivity(new Intent(LoginActivity.this, UpdateUserActivity.class));
+                            if(mAuth.getCurrentUser()!=null&&"true".equals(mAuth.getCurrentUser().getDisplayName())) {
+                                Intent intent = new Intent(LoginActivity.this,DashBoardActivity.class);
+                                intent.putExtra("parent", TAG);
+                                startActivity(intent);
+                            }else{
+                                Intent intent = new Intent(LoginActivity.this, UpdateUserActivity.class);
+                                intent.putExtra("parent", TAG);
+                                startActivity(intent);
+                            }
                             finish();
                         } else {
                             progressDialog.dismiss();
@@ -238,8 +246,18 @@ public class LoginActivity extends AppCompatActivity {
                                 DatabaseReference reference=database.getReference("Users");
                                 reference.child(uid).setValue(u1);
                             }
-                            startActivity(new Intent(LoginActivity.this, DashBoardActivity.class));
-                            finish();}catch(Exception ignored){
+                            if(mAuth.getCurrentUser()!=null&&"true".equals(mAuth.getCurrentUser().getDisplayName())) {
+                                Intent intent = new Intent(LoginActivity.this,DashBoardActivity.class);
+                                intent.putExtra("parent", TAG);
+                                startActivity(intent);
+                            }else{
+                                Intent intent = new Intent(LoginActivity.this, UpdateUserActivity.class);
+                                intent.putExtra("parent", TAG);
+                                startActivity(intent);
+                            }
+                            finish();
+                            }
+                            catch(Exception ignored){
                                 Toast.makeText(LoginActivity.this, "there was error please try again", Toast.LENGTH_SHORT).show();
                             }
                         } else {

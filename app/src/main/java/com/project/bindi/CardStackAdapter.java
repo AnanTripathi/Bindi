@@ -87,43 +87,51 @@ public class CardStackAdapter extends RecyclerView.Adapter<CardStackAdapter.View
     }
     private void playAudio(User data) {
         if(isAudioOn){
+           stop(data);
+        }
+        else{
+            play(data);
+        }
+    }
+    private void stop(User data){
+        if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+        mediaPlayer.stop();
+        mediaPlayer.reset();
+        mediaPlayer.release();
+        isAudioOn=true;}
+    }
+    private void play(User data){
+        if (mediaPlayer != null && mediaPlayer.isPlaying()) {
             mediaPlayer.stop();
             mediaPlayer.reset();
             mediaPlayer.release();
+            isAudioOn=false;
         }
-        else{
-            if (mediaPlayer != null && mediaPlayer.isPlaying()) {
-                mediaPlayer.stop();
-                mediaPlayer.reset();
-                mediaPlayer.release();
-                isAudioOn=false;
-            }
-            mediaPlayer=new MediaPlayer();
-            try{
-                mediaPlayer.setAudioAttributes(
-                        new AudioAttributes.Builder()
-                                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                                .setUsage(AudioAttributes.USAGE_MEDIA)
-                                .build()
-                );}
-            catch (NullPointerException e) {
-                Toast.makeText(context, "mediaplayer:-"+e.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-            try {
-                mediaPlayer.setDataSource(data.getAudio());
-            } catch (IOException e) {
-                Toast.makeText(context, "mediaplayer:-"+e.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-            try {
-                mediaPlayer.prepare(); // might take long! (for buffering, etc)
-                mediaPlayer.start();
-                isAudioOn=true;
-            } catch (IOException e) {
-                Toast.makeText(context, "mediaplayer:-"+e.getMessage(), Toast.LENGTH_SHORT).show();
-            }
+        mediaPlayer=new MediaPlayer();
+        try{
+            mediaPlayer.setAudioAttributes(
+                    new AudioAttributes.Builder()
+                            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                            .setUsage(AudioAttributes.USAGE_MEDIA)
+                            .build()
+            );}
+        catch (NullPointerException e) {
+            Toast.makeText(context, "mediaplayer:-"+e.getMessage(), Toast.LENGTH_SHORT).show();
         }
+        try {
+            mediaPlayer.setDataSource(data.getAudio());
+        } catch (IOException e) {
+            Toast.makeText(context, "mediaplayer:-"+e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+        try {
+            mediaPlayer.prepare(); // might take long! (for buffering, etc)
+            mediaPlayer.start();
+            isAudioOn=true;
+        } catch (IOException e) {
+            Toast.makeText(context, "mediaplayer:-"+e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+        isAudioOn=false;
     }
-
 }
 
 

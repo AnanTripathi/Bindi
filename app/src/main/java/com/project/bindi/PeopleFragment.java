@@ -81,17 +81,19 @@ public class PeopleFragment extends Fragment {
                 for(DataSnapshot ds: snapshot.getChildren())
                 {
                     User user1=ds.getValue(User.class);
-                    if(!(user1.getUid().equals(Firebaseuser.getUid())))
-                    {
-                        allUserInfo.add(user1);
-                        if(allUserInfo.size()==1){
-                        adapter = new CardStackAdapter(getContext(),allUserInfo);}
-                        else adapter.notifyItemInserted(allUserInfo.size()-1);
-                        init(view);
-                        rewindFab.setEnabled(true);
-                        likeFab.setEnabled(true);
-                        dislikeFab.setEnabled(true);
-                        doubleLikeFab.setEnabled(true);
+                    if(user1.isProfileComplete()) {
+                        if (!(user1.getUid().equals(Firebaseuser.getUid()))) {
+                            if(user1.getGender().equals(DashBoardActivity.loggedInUser.getInterestedin())){
+                            allUserInfo.add(user1);
+                            if (allUserInfo.size() == 1) {
+                                adapter = new CardStackAdapter(getContext(), allUserInfo);
+                            } else adapter.notifyItemInserted(allUserInfo.size() - 1);
+                            init(view);
+                            rewindFab.setEnabled(true);
+                            likeFab.setEnabled(true);
+                            dislikeFab.setEnabled(true);
+                            doubleLikeFab.setEnabled(true);}
+                        }
                     }
                 }
             }

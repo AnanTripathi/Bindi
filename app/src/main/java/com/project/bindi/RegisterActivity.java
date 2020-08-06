@@ -35,6 +35,7 @@ public class RegisterActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     MaterialButton haveAccountMb;
     FirebaseDatabase database;
+    private static final String TAG = "RegisterActivity";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -111,8 +112,10 @@ public class RegisterActivity extends AppCompatActivity {
                                 reference.child(uid).setValue(u1);
 
                                 Toast.makeText(RegisterActivity.this, "Registered..\n" + user.getEmail(), Toast.LENGTH_SHORT).show();
-                                startActivity(new Intent(RegisterActivity.this, UpdateUserActivity.class));
-                                Toast.makeText(RegisterActivity.this, "hello", Toast.LENGTH_SHORT).show();
+
+                                Intent intent=new Intent(RegisterActivity.this,UpdateUserActivity.class);
+                                intent.putExtra("parent",TAG);
+                                startActivity(intent);
                                 finish();
                             }catch(Exception ignore){
                                 Toast.makeText(RegisterActivity.this, "some internet error", Toast.LENGTH_SHORT).show();

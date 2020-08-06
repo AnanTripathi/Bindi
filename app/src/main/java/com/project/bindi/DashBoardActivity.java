@@ -7,11 +7,14 @@ import androidx.fragment.app.FragmentTransaction;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -23,14 +26,18 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 public class DashBoardActivity extends AppCompatActivity {
-    ActionBar actionBar;
-    FirebaseAuth firebaseAuth;
-    String Uid;
+    private ActionBar actionBar;
+    private FirebaseAuth firebaseAuth;
+    private String Uid;
+    static public User loggedInUser;
+    private DatabaseReference usersDatabaseReference;
+    private static final String TAG = "DashBoardActivity";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dash_board);
         firebaseAuth=FirebaseAuth.getInstance();
+        usersDatabaseReference=FirebaseDatabase.getInstance().getReference("Users");
 
         checkUserStatus();
         actionBar=getSupportActionBar();
@@ -38,11 +45,28 @@ public class DashBoardActivity extends AppCompatActivity {
         BottomNavigationView bottomNavigationView=findViewById(R.id.navigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(selectedlistener);
 
-
         PeopleFragment fragment1=new PeopleFragment();
         FragmentTransaction ft1=getSupportFragmentManager().beginTransaction();
         ft1.replace(R.id.content,fragment1,"");
         ft1.commit();
+
+        final Query userQuery = usersDatabaseReference.orderByChild("uid").equalTo(firebaseAuth.getUid());
+        userQuery.addValueEventListener(new ValueEventListener() {
+
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                try{
+                loggedInUser = snapshot.child(firebaseAuth.getUid()).getValue(User.class);}
+                catch (NullPointerException exception){
+                    Toast.makeText(DashBoardActivity.this, "Network issue", Toast.LENGTH_SHORT).show();
+                    Log.e(TAG,""+exception.getMessage());
+                }
+                }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
     private BottomNavigationView.OnNavigationItemSelectedListener selectedlistener=
             new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -99,8 +123,10 @@ public class DashBoardActivity extends AppCompatActivity {
     private void checkUserStatus(){
         FirebaseUser user=firebaseAuth.getCurrentUser();
         if(user!=null){
-            if(user.getDisplayName().equals("false")){
-                startActivity(new Intent(DashBoardActivity.this,UpdateUserActivity.class));
+            if(user.getDisplayName()!=null&&user.getDisplayName().equals("false")){
+                Intent intent=new Intent(DashBoardActivity.this,UpdateUserActivity.class);
+                intent.putExtra("parent",TAG);
+                startActivity(intent);
                 finish();
             }
         }

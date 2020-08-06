@@ -2,8 +2,10 @@ package com.project.bindi;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
@@ -28,8 +30,10 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Toast;
+import androidx.appcompat.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.util.ExceptionCatchingInputStream;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -52,6 +56,7 @@ import com.google.firebase.storage.UploadTask;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Objects;
 
 public class UpdateUserActivity extends AppCompatActivity {
     Spinner genderSpinner,interestedInSpinner;
@@ -66,6 +71,7 @@ public class UpdateUserActivity extends AppCompatActivity {
     FirebaseDatabase firebaseDatabase;
     ImageView imageView;
     String imageUri="";
+    CardView profileImageHolderCard;
 
     //for image
     StorageReference storageReference;
@@ -82,11 +88,14 @@ public class UpdateUserActivity extends AppCompatActivity {
     Button editVoiceButton;
     String voiceUri="";
     FloatingActionButton playVoiceButton;
+    private Toolbar toolbar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_update_user);
+        toolbar=findViewById(R.id.app_bar);
         imageView=findViewById(R.id.profileImage);
+        profileImageHolderCard=findViewById(R.id.profileImageHolder);
         playVoiceButton=findViewById(R.id.play_voiceButton);
         imageProgressBar=findViewById(R.id.progressImage);
         editVoiceButton=findViewById(R.id.editVoiceButton);
@@ -105,6 +114,7 @@ public class UpdateUserActivity extends AppCompatActivity {
         interestedInSpinner=(Spinner) findViewById(R.id.interestedin_spinner);
         save = findViewById(R.id.save);
         save.setEnabled(false);
+        recieveIntent();
         editVoiceButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -112,9 +122,9 @@ public class UpdateUserActivity extends AppCompatActivity {
 
             }
         });
-        ArrayAdapter<CharSequence> genderadapter = ArrayAdapter.createFromResource(this,
+        final ArrayAdapter<CharSequence> genderadapter = ArrayAdapter.createFromResource(this,
                 R.array.gender_array, android.R.layout.simple_spinner_item);
-        ArrayAdapter<CharSequence> interestedinadapter = ArrayAdapter.createFromResource(this,
+        final ArrayAdapter<CharSequence> interestedinadapter = ArrayAdapter.createFromResource(this,
                 R.array.interestedin_array, android.R.layout.simple_spinner_item);
 // Specify the layout to use when the list of choices appears
         interestedinadapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -171,6 +181,7 @@ public class UpdateUserActivity extends AppCompatActivity {
                 } else {
                     userdata =new User(firebaseUser.getUid(), firebaseUser.getEmail(), name, age, gender, description,interestedIn, imageUri,voiceUri,0);
                     usersDatabaseReference.child(firebaseUser.getUid()).setValue(userdata);
+                    imageUri=userdata.getImage();
                     if (userdata.isProfileComplete()) {
                         UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
                                 .setDisplayName("true")
@@ -200,8 +211,10 @@ public class UpdateUserActivity extends AppCompatActivity {
                         progressBar.setVisibility(View.GONE);
                         if(isImageBeingUploaded){}
                         else{
-                        imageProgressBar.setVisibility(View.GONE);}
-                        save.setEnabled(true);
+                        imageProgressBar.setVisibility(View.GONE);
+                            }
+                        if(userdata.isProfileComplete()){
+                        save.setEnabled(true);}
                     }
                 }
             }
@@ -211,33 +224,56 @@ public class UpdateUserActivity extends AppCompatActivity {
 
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                userdata = snapshot.child(firebaseAuth.getUid()).getValue(User.class);
-                voiceUri=userdata.getAudio();
-                if (userdata.isProfileComplete()) {
+                userdata = snapshot.child(Objects.requireNonNull(firebaseAuth.getUid())).getValue(User.class);
 
-                    imageProgressBar.setVisibility(View.VISIBLE);
-                    nameEt.setText(userdata.getName());
-                    ageEt.setText(userdata.getAge());
-                    int position;
-                    if (userdata.getGender().equals("Male")) {
-                        position = 0;
-                    } else {
-                        position = 1;
+                if (userdata != null) {
+                    imageUri = userdata.getImage();
+                    if (userdata.getAudio()!=null&&!userdata.getAudio().equals(""))
+                        voiceUri = userdata.getAudio();
+
+                    if (userdata.getImage()!=null&&!userdata.getImage().equals("")) {
+
+                        imageProgressBar.setVisibility(View.VISIBLE);
+                        Glide.with(UpdateUserActivity.this)
+                                .load(userdata.getImage())
+                                .error(R.drawable.broken_image_black)
+                                .fallback(R.drawable.broken_image_black)
+                                .transition(DrawableTransitionOptions.withCrossFade())
+                                .into(imageView);
+                        save.setEnabled(true);
                     }
-                    genderSpinner.setSelection(position);
-                    descriptionEt.setText(userdata.getDescription());
-                    Glide.with(UpdateUserActivity.this)
-                            .load(userdata.getImage())
-                            .into(imageView);
-                }
-                else{
-                    Toast.makeText(UpdateUserActivity.this, "Please complete the profile", Toast.LENGTH_SHORT).show();
-                }
-                imageProgressBar.setVisibility(View.GONE);
-                progressBar.setVisibility(View.GONE);
-                save.setEnabled(true);
-            }
+                    if(userdata.getName()!=null&&userdata.getAge()!=null&&userdata.getGender()!=null&&userdata.getInterestedin()!=null&&!userdata.getName().equals("")&&!userdata.getGender().equals("")&&!userdata.getInterestedin().equals("")) {
+                        nameEt.setText(userdata.getName());
+                        ageEt.setText(userdata.getAge());
+                        int genderPosition, interestedPosition;
+                        if (userdata.getGender().equals("Male")) {
+                            genderPosition = 0;
+                        } else {
+                            genderPosition = 1;
+                        }
+                        if (userdata.getInterestedin().equals("Male")) {
+                            interestedPosition = 0;
+                        } else if (userdata.getInterestedin().equals("Female")) {
+                            interestedPosition = 1;
+                        } else {
+                            interestedPosition = 2;
+                        }
 
+                        genderSpinner.setSelection(genderPosition);
+                        interestedInSpinner.setSelection(interestedPosition);
+                        descriptionEt.setText(userdata.getDescription());
+                    }
+                    }
+                else {
+                        Toast.makeText(UpdateUserActivity.this, "Please complete the profile", Toast.LENGTH_SHORT).show();
+                    }
+                    imageProgressBar.setVisibility(View.GONE);
+                    progressBar.setVisibility(View.GONE);
+                    if(userdata.isProfileComplete()){
+                    save.setEnabled(true);
+                    }
+
+            }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
@@ -249,33 +285,68 @@ public class UpdateUserActivity extends AppCompatActivity {
                 isImageBeingUploaded=true;
                 imageProgressBar.setVisibility(View.VISIBLE);
                 showImagePicDialog();
+                save.setEnabled(false);
             }
         });
         playVoiceButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Uri myUri = Uri.parse(userdata.getAudio()); // initialize Uri here
-                MediaPlayer mediaPlayer = new MediaPlayer();
-                mediaPlayer.setAudioAttributes(
-                        new AudioAttributes.Builder()
-                                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                                .setUsage(AudioAttributes.USAGE_MEDIA)
-                                .build()
-                );
-                try {
-                    mediaPlayer.setDataSource(getApplicationContext(), myUri);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                try {
-                    mediaPlayer.prepare();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                mediaPlayer.start();
+                if (userdata != null && userdata.getAudio() != null && !userdata.getAudio().equals("")) {
+                    Uri myUri = Uri.parse(userdata.getAudio()); // initialize Uri here
+                    MediaPlayer mediaPlayer = new MediaPlayer();
+                    mediaPlayer.setAudioAttributes(
+                            new AudioAttributes.Builder()
+                                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                                    .build()
+                    );
+                    try {
+                        mediaPlayer.setDataSource(getApplicationContext(), myUri);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        mediaPlayer.prepare();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    mediaPlayer.start();
 
+                }
+                else{
+                    Toast.makeText(UpdateUserActivity.this, "Please update the audio first", Toast.LENGTH_SHORT).show();
+                }
+                
             }
         });
+    }
+
+    private void recieveIntent() {
+//        ActionBar actionBar=getSupportActionBar();
+//        if (actionBar != null) {
+//            actionBar.hide();
+//        }
+        Bundle extras = getIntent().getExtras();
+        String parentActivity="";
+
+        if (extras != null) {
+            parentActivity = extras.getString("parent");
+            Toast.makeText(this, "The parent activity was "+parentActivity , Toast.LENGTH_SHORT).show();
+            // and get whatever type user account id is
+        }
+
+//        if(parentActivity!=null){
+//        if(parentActivity.equals("RegisterActivity")||parentActivity.equals("LoginActivity")){
+//            toolbar.collapseActionView();
+//        }
+//        else if(parentActivity.equals("DashBoardActivity")){
+//            toolbar.collapseActionView();
+//        }}
+    }
+    @Override
+    public boolean onSupportNavigateUp(){
+        finish();
+        return true;
     }
 
 
@@ -345,6 +416,13 @@ public class UpdateUserActivity extends AppCompatActivity {
         String option[] = {"Camera", "Gallery"};
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Pick Image From");
+        builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                save.setEnabled(true);
+                progressBar.setVisibility(View.GONE);
+            }
+        });
         builder.setItems(option, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -455,10 +533,18 @@ public class UpdateUserActivity extends AppCompatActivity {
                                                 Glide.with(UpdateUserActivity.this)
                                                         .load(userdata.getImage())
                                                         .into(imageView);
-
+                                                editProfileImageBn.setEnabled(true);
+                                                save.setEnabled(true);
                                                 Toast.makeText(UpdateUserActivity.this, "Image Updated....", Toast.LENGTH_SHORT).show();
                                             }
-                                        });
+                                        }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        editProfileImageBn.setEnabled(true);
+                                        save.setEnabled(true);
+                                        Toast.makeText(UpdateUserActivity.this, "Network error \n you might need to re-upload image", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
                                 if (userdata.isProfileComplete()) {
                                     UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
                                             .setDisplayName("true")
@@ -478,6 +564,7 @@ public class UpdateUserActivity extends AppCompatActivity {
                                 }
                                 imageProgressBar.setVisibility(View.GONE);
                             }catch (Exception ignore){
+                                save.setEnabled(true);
                                 Toast.makeText(UpdateUserActivity.this, "Can't upload image internet error", Toast.LENGTH_SHORT).show();
                             }
                         }
