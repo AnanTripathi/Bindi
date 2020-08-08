@@ -1,21 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.project.bindi">
-<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
-    <uses-permission android:name="android.permission.CAMERA"/>
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.CAMERA" />
+
     <application
+        android:name=".BindiFirebase"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher_bindi"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_bindi_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".RegisterActivity"></activity>
-        <activity android:name=".MainActivity2"></activity>
-        <activity android:name=".LoginActivity" >
-
-        </activity>
+        <activity android:name=".SendMessage"></activity>
+        <activity android:name=".RegisterActivity" />
+        <activity android:name=".MainActivity2" />
+        <activity android:name=".LoginActivity"></activity>
         <activity android:name=".UpdateUserActivity" />
         <activity android:name=".DashBoardActivity">
             <intent-filter>

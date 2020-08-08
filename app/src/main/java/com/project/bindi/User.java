@@ -32,6 +32,10 @@ public class User {
     public void increaseLikes(){
         likes++;
     }
+    public void doubleIncreaseLike(){
+        likes++;
+        likes++;
+    }
     public void decreaseLikes(){
         likes--;
     }

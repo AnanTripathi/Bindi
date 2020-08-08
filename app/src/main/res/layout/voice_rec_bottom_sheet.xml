@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    android:id="@+id/sheetcardview"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:elevation="10dp"
+    android:background="#ffffff"
+    app:behavior_hideable="true"
+    app:behavior_peekHeight="0dp"
+    app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
+    app:cardCornerRadius="20dp"
+    >
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <ImageButton
+            android:id="@+id/arrowIb"
+            android:layout_alignParentEnd="true"
+            android:layout_margin="20dp"
+            android:backgroundTint="#FFFF00"
+            android:background="@drawable/custom_design_fab_background"
+            android:src="@drawable/arrow_up"
+            android:layout_width="30dp"
+            android:layout_height="30dp"/>
+    <ImageButton
+        android:layout_margin="20dp"
+        android:id="@+id/recordfabIb"
+        style="@style/Widget.Design.CustomFloatingActionButtonBlue"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/mic_image"/>
+    </RelativeLayout>
+</com.google.android.material.card.MaterialCardView>

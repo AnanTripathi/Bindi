@@ -1,5 +1,12 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
+    <dimen name="custom_design_fab_border_width">0.5dp</dimen>
+    <dimen name="custom_design_fab_elevation">6dp</dimen>
+    <dimen name="custom_design_fab_image_size">50dp</dimen>
+    <dimen name="custom_design_fab_size_mini">40dp</dimen>
+    <dimen name="custom_design_fab_size_normal">56dp</dimen>
+    <dimen name="custom_design_fab_translation_z_hovered_focused">6dp</dimen>
+    <dimen name="custom_design_fab_translation_z_pressed">6dp</dimen>
     <style name="AppTheme" parent="Theme.MaterialComponents.Light.DarkActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
@@ -52,5 +59,35 @@
         <item name="android:background">?attr/colorAccent</item>
         <item name="android:theme">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
         <item name="popupTheme">@style/ThemeOverlay.AppCompat.Light</item>
+    </style>
+    <style name="Widget.Design.CustomFloatingActionButtonBlue" parent="android:Widget">
+        <item name="android:background">@drawable/custom_design_fab_background</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="backgroundTint">@color/colorAccent</item>
+        <item name="fabSize">auto</item>
+        <item name="elevation">@dimen/custom_design_fab_elevation</item>
+        <item name="hoveredFocusedTranslationZ">@dimen/custom_design_fab_translation_z_hovered_focused</item>
+        <item name="pressedTranslationZ">@dimen/custom_design_fab_translation_z_pressed</item>
+        <item name="rippleColor">?attr/colorControlHighlight</item>
+        <item name="borderWidth">@dimen/custom_design_fab_border_width</item>
+        <item name="maxImageSize">@dimen/custom_design_fab_image_size</item>
+        <item name="showMotionSpec">@anim/custom_design_fab_show_motion_spec</item>
+        <item name="hideMotionSpec">@anim/custom_design_fab_hide_motion_spec</item>
+    </style>
+    <style name="Widget.Design.CustomFloatingActionButtonRed" parent="android:Widget">
+        <item name="android:background">@drawable/custom_design_fab_background</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="backgroundTint">#FF0000</item>
+        <item name="fabSize">auto</item>
+        <item name="elevation">@dimen/custom_design_fab_elevation</item>
+        <item name="hoveredFocusedTranslationZ">@dimen/custom_design_fab_translation_z_hovered_focused</item>
+        <item name="pressedTranslationZ">@dimen/custom_design_fab_translation_z_pressed</item>
+        <item name="rippleColor">?attr/colorControlHighlight</item>
+        <item name="borderWidth">@dimen/custom_design_fab_border_width</item>
+        <item name="maxImageSize">@dimen/custom_design_fab_image_size</item>
+        <item name="showMotionSpec">@anim/custom_design_fab_show_motion_spec</item>
+        <item name="hideMotionSpec">@anim/custom_design_fab_hide_motion_spec</item>
     </style>
 </resources>

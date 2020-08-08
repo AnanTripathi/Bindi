@@ -1,5 +1,7 @@
 package com.project.bindi;
 
+import android.content.Context;
+import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 
@@ -23,6 +25,8 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.dialog.MaterialDialogs;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -43,6 +47,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 public class PeopleFragment extends Fragment {
 
@@ -113,18 +118,21 @@ public class PeopleFragment extends Fragment {
         @Override
         public void onClick(View v) {
             cardStackView.swipe();
+            likeThePerson();
         }
     });
     dislikeFab.setOnClickListener(new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             cardStackView.swipe();
+            dislikeThePerson();
         }
     });
     doubleLikeFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 cardStackView.swipe();
+                doubleLikeThePerson();
             }
         });
         return view;
@@ -146,9 +154,10 @@ public class PeopleFragment extends Fragment {
 
                 if (direction == Direction.Left){
                     dislikeThePerson();
-                    Toast.makeText(getContext(), "Direction Left", Toast.LENGTH_SHORT).show();
                 }
-
+                if(direction == Direction.Top){
+                    doubleLikeThePerson();
+                }
                 // Paginating
 //                if (manager.getTopPosition() == adapter.getItemCount() - 5){
 //                    paginate();
@@ -211,7 +220,7 @@ public class PeopleFragment extends Fragment {
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        Toast.makeText(getActivity(), "you disliked" + allUserInfo.get(topPosition).getName(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "you disliked "+allUserInfo.get(topPosition).getName(), Toast.LENGTH_SHORT).show();
                     }
                 });
     }
@@ -224,11 +233,25 @@ public class PeopleFragment extends Fragment {
         usersDatabaseReference.child(allUserInfo.get(topPosition).getUid()).updateChildren(results).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
-                Toast.makeText(getActivity(), "you liked the person", Toast.LENGTH_SHORT).show();
+
+                Toast.makeText(getActivity(), "you liked "+ allUserInfo.get(topPosition).getName(), Toast.LENGTH_SHORT).show();
             }
         });
-
-
     }
-
+    private void doubleLikeThePerson() {
+        final int topPosition=manager.getTopPosition()-1;
+        allUserInfo.get(topPosition).doubleIncreaseLike();
+        HashMap<String, Object> results = new HashMap<>();
+        results.put("likes", allUserInfo.get(topPosition).getLikes());
+        usersDatabaseReference.child(allUserInfo.get(topPosition).getUid()).updateChildren(results).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Toast.makeText(getActivity(), "you double liked "+ allUserInfo.get(topPosition).getName(), Toast.LENGTH_SHORT).show();
+            }
+        });
+        Intent intent=new Intent(getActivity(),SendMessage.class);
+        intent.putExtra("toId",allUserInfo.get(topPosition).getUid());
+        startActivity(intent);
+      //  Objects.requireNonNull(getActivity()).finish();
+    }
 }

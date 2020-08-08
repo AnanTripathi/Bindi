@@ -9,15 +9,18 @@ import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.AudioAttributes;
 import android.media.MediaPlayer;
+import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -26,6 +29,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
@@ -39,6 +43,9 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -54,6 +61,7 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Objects;
@@ -67,11 +75,17 @@ public class UpdateUserActivity extends AppCompatActivity {
     ProgressBar progressBar,imageProgressBar;
     FirebaseUser firebaseUser;
     User userdata;
+    private MediaRecorder recorder = null;
     DatabaseReference usersDatabaseReference;
     FirebaseDatabase firebaseDatabase;
     ImageView imageView;
     String imageUri="";
     CardView profileImageHolderCard;
+    private ImageButton arrowIbSheet,recordFabIbSheet;
+    private BottomSheetBehavior mBottomSheetBehavior;
+    private MaterialCardView sheetCardView;
+    private Boolean isRecordBottonPressed=false,startRecording=true;
+    private String fileName=null;
 
     //for image
     StorageReference storageReference;
@@ -81,6 +95,7 @@ public class UpdateUserActivity extends AppCompatActivity {
     private static final int STORAGE_REQUEST_CODE = 200;
     private static final int IMAGE_PICK_GALLERY_CODE = 300;
     private static final int IMAGE_PICK_CAMERA_CODE = 400;
+    private static final int REQUEST_RECORD_AUDIO_PERMISSION = 500;
     Boolean isImageBeingUploaded=false;
     String cameraPermission[];
     String storagePermission[];
@@ -89,6 +104,7 @@ public class UpdateUserActivity extends AppCompatActivity {
     String voiceUri="";
     FloatingActionButton playVoiceButton;
     private Toolbar toolbar;
+    private String [] audioPermission = {Manifest.permission.RECORD_AUDIO,Manifest.permission.WRITE_EXTERNAL_STORAGE};
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -96,6 +112,19 @@ public class UpdateUserActivity extends AppCompatActivity {
         toolbar=findViewById(R.id.app_bar);
         imageView=findViewById(R.id.profileImage);
         profileImageHolderCard=findViewById(R.id.profileImageHolder);
+        try{
+            fileName = getExternalCacheDir().getAbsolutePath();}
+        catch (Exception e){
+            Toast.makeText(this, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+
+        fileName += "/audiorecordtest.mp3";
+        //sheet
+        sheetCardView=findViewById(R.id.sheetcardview);
+        mBottomSheetBehavior=BottomSheetBehavior.from(sheetCardView);
+        arrowIbSheet=findViewById(R.id.arrowIb);
+        recordFabIbSheet=findViewById(R.id.recordfabIb);
+
         playVoiceButton=findViewById(R.id.play_voiceButton);
         imageProgressBar=findViewById(R.id.progressImage);
         editVoiceButton=findViewById(R.id.editVoiceButton);
@@ -115,13 +144,7 @@ public class UpdateUserActivity extends AppCompatActivity {
         save = findViewById(R.id.save);
         save.setEnabled(false);
         recieveIntent();
-        editVoiceButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(UpdateUserActivity.this,MainActivity2.class));
 
-            }
-        });
         final ArrayAdapter<CharSequence> genderadapter = ArrayAdapter.createFromResource(this,
                 R.array.gender_array, android.R.layout.simple_spinner_item);
         final ArrayAdapter<CharSequence> interestedinadapter = ArrayAdapter.createFromResource(this,
@@ -177,11 +200,10 @@ public class UpdateUserActivity extends AppCompatActivity {
                     save.setEnabled(true);
                     progressBar.setVisibility(View.GONE);
                     imageProgressBar.setVisibility(View.GONE);
-                    Toast.makeText(UpdateUserActivity.this, "Please fill all the details", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(UpdateUserActivity.this, "Please fill name,age and description", Toast.LENGTH_SHORT).show();
                 } else {
                     userdata =new User(firebaseUser.getUid(), firebaseUser.getEmail(), name, age, gender, description,interestedIn, imageUri,voiceUri,0);
                     usersDatabaseReference.child(firebaseUser.getUid()).setValue(userdata);
-                    imageUri=userdata.getImage();
                     if (userdata.isProfileComplete()) {
                         UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
                                 .setDisplayName("true")
@@ -207,12 +229,17 @@ public class UpdateUserActivity extends AppCompatActivity {
 
                     }
                     else{
-                        Toast.makeText(UpdateUserActivity.this, "Please complete the profile", Toast.LENGTH_SHORT).show();
                         progressBar.setVisibility(View.GONE);
-                        if(isImageBeingUploaded){}
+                        if(isImageBeingUploaded){
+                            Toast.makeText(UpdateUserActivity.this, "Please wait while image uploads", Toast.LENGTH_SHORT).show();
+                        }
                         else{
+                            if(userdata.getImage().length()==0)
+                            Toast.makeText(UpdateUserActivity.this, "Please upload image", Toast.LENGTH_SHORT).show();
                         imageProgressBar.setVisibility(View.GONE);
                             }
+                        if(userdata.getAudio().length()==0)
+                            Toast.makeText(UpdateUserActivity.this, "Please upload your voice", Toast.LENGTH_SHORT).show();
                         if(userdata.isProfileComplete()){
                         save.setEnabled(true);}
                     }
@@ -319,6 +346,50 @@ public class UpdateUserActivity extends AppCompatActivity {
                 
             }
         });
+        mBottomSheetBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+
+            }
+
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+                arrowIbSheet.setRotation(slideOffset * 180);
+            }
+        });
+        editVoiceButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(mBottomSheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED){
+                    mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                } else {
+                    mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                }
+            }
+        });
+        recordFabIbSheet.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!isRecordBottonPressed){
+                    mBottomSheetBehavior.setHideable(false);
+                    recordFabIbSheet.setBackgroundTintList(getResources().getColorStateList(R.color.on_press));
+                    //set color red an start recording
+                    if (!checkRecordPermission()) {
+                        requestRecordPermission();
+                    } else {
+                        startAudioRecording();
+                    }
+
+                }
+                else{
+                    startAudioRecording();
+                    recordFabIbSheet.setBackgroundTintList(getResources().getColorStateList(R.color.on_re_press));
+                    mBottomSheetBehavior.setHideable(true);
+                    //set color blue and stop recording
+                }
+                isRecordBottonPressed=!isRecordBottonPressed;
+            }
+        });
     }
 
     private void recieveIntent() {
@@ -411,7 +482,16 @@ public class UpdateUserActivity extends AppCompatActivity {
         return !result && !result1;
 
     }
-
+    private boolean checkRecordPermission(){
+        boolean result = ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
+                == (PackageManager.PERMISSION_DENIED);
+        boolean result1 = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                == (PackageManager.PERMISSION_DENIED);
+        return !result && !result1;
+    }
+    private void requestRecordPermission() {
+        requestPermissions(audioPermission, REQUEST_RECORD_AUDIO_PERMISSION);
+    }
     private void showImagePicDialog() {
         String option[] = {"Camera", "Gallery"};
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -476,6 +556,23 @@ public class UpdateUserActivity extends AppCompatActivity {
                 }
             }
             break;
+            case REQUEST_RECORD_AUDIO_PERMISSION:{
+                if(grantResults.length>0){
+                    boolean audioAccepted=grantResults[0]==PackageManager.PERMISSION_GRANTED;
+                    boolean writeStorageAccepted=grantResults[1]==PackageManager.PERMISSION_GRANTED;
+                    if(audioAccepted && writeStorageAccepted){
+                        //permission enable
+                        startAudioRecording();
+                    }
+                    else{
+                        isRecordBottonPressed=!isRecordBottonPressed;
+                        recordFabIbSheet.setBackgroundTintList(getResources().getColorStateList(R.color.on_re_press));
+                        mBottomSheetBehavior.setHideable(true);
+                        Toast.makeText(this,"Please enable audio and storage",Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+            break;
             case STORAGE_REQUEST_CODE:{
                 if(grantResults.length>0){
                     //  boolean cameraAccepted=grantResults[0]==PackageManager.PERMISSION_GRANTED;
@@ -494,6 +591,85 @@ public class UpdateUserActivity extends AppCompatActivity {
         // super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
+    private void startAudioRecording() {
+        onRecord(startRecording);
+        startRecording = !startRecording;
+    }
+    private void onRecord(boolean start) {
+        if (start) {
+            startRecordingAudio();
+        } else {
+            stopRecording();
+        }
+    }
+    private void startRecordingAudio() {
+        recorder = new MediaRecorder();
+        recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+        recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+        recorder.setOutputFile(fileName);
+        recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+        try {
+            recorder.prepare();
+        } catch (IOException e) {
+            Log.e("UpdateUserActivity", "prepare() failed");
+        }
+        recorder.start();
+    }
+    private void stopRecording() {
+        recorder.stop();
+        recorder.release();
+        recorder = null;
+        uploadAudio();
+    }
+    private void uploadAudio() {
+        progressBar.setVisibility(View.VISIBLE);
+        final ProgressDialog uploadProgressDialog=new ProgressDialog(UpdateUserActivity.this);
+        uploadProgressDialog.setMessage("Audio is uploading");
+        uploadProgressDialog.setCancelable(true);
+        uploadProgressDialog.create();
+        uploadProgressDialog.show();
+        Uri uri=Uri.fromFile(new File(fileName));
+        String filePathAndName=storagePath+"profile_"+firebaseAuth.getUid();
+        StorageReference storageReference2nd= FirebaseStorage.getInstance().getReference().child(filePathAndName);
+        storageReference2nd.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                Task<Uri> task = taskSnapshot.getStorage().getDownloadUrl();
+                while(!task.isSuccessful());
+                if (task.isSuccessful()) {
+                    Uri uri=task.getResult();
+                    HashMap<String,Object> map=new HashMap<>();
+                    map.put("audio",uri.toString());
+                    usersDatabaseReference.child(userdata.getUid()).updateChildren(map)
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    progressBar.setVisibility(View.GONE);
+                                    uploadProgressDialog.dismiss();
+                                    mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                                    Toast.makeText(UpdateUserActivity.this, "Voice Uploaded", Toast.LENGTH_SHORT).show();
+
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            progressBar.setVisibility(View.GONE);
+                            uploadProgressDialog.dismiss();
+                            Toast.makeText(UpdateUserActivity.this, "Voice Upload failed", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                progressBar.setVisibility(View.GONE);
+                uploadProgressDialog.dismiss();
+                Toast.makeText(UpdateUserActivity.this, "voice upload failure"+e.getMessage(), Toast.LENGTH_SHORT).show();
+
+            }
+        });
+    }
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if(resultCode==RESULT_OK){
