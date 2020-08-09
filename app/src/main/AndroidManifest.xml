@@ -14,9 +14,9 @@
         android:roundIcon="@mipmap/ic_launcher_bindi_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".SendMessage"></activity>
+        <activity android:name=".SendMessageActivity"></activity>
         <activity android:name=".RegisterActivity" />
-        <activity android:name=".MainActivity2" />
+        
         <activity android:name=".LoginActivity"></activity>
         <activity android:name=".UpdateUserActivity" />
         <activity android:name=".DashBoardActivity">

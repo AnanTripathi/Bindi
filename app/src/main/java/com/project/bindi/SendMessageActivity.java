@@ -13,7 +13,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -21,7 +20,6 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
@@ -33,9 +31,8 @@ import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 
-public class SendMessage extends AppCompatActivity {
+public class SendMessageActivity extends AppCompatActivity {
     private ImageButton sendVoiceIb;
     private MaterialButton sendMessageBn;
     private EditText messageEt;
@@ -91,16 +88,17 @@ public class SendMessage extends AppCompatActivity {
         sendMessageBn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                uploadAudio();
                 if(messageEt.getText().toString().trim().equals("")){
                     messageTil.setFocusable(View.FOCUSABLE);
-                    Toast.makeText(SendMessage.this, "Please write a message", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SendMessageActivity.this, "Please write a message", Toast.LENGTH_SHORT).show();
                 }
                 else{
                     Message message=new Message(firebaseAuth.getUid()+recieverId,firebaseAuth.getUid(),recieverId,messageEt.getText().toString().trim(),audioUri);
                     DatabaseReference messageDatabaseReference=FirebaseDatabase.getInstance().getReference(Message.parentLocation);
                     messageDatabaseReference.child(message.getMessageId()).setValue(message);
                 }
-                startActivity(new Intent(SendMessage.this,DashBoardActivity.class));
+                startActivity(new Intent(SendMessageActivity.this,DashBoardActivity.class));
             }
         });
     }
@@ -152,13 +150,14 @@ public class SendMessage extends AppCompatActivity {
         }
         recorder.release();
         recorder = null;
-        uploadAudio();
+       // uploadAudio();
+        sendMessageBn.setEnabled(true);
     }
     private void uploadAudio() {
-        final ProgressDialog uploadProgressDialog=new ProgressDialog(SendMessage.this);
+        final ProgressDialog uploadProgressDialog=new ProgressDialog(SendMessageActivity.this);
         sendVoiceIb.setEnabled(false);
         uploadProgressDialog.setMessage("Audio is uploading");
-        uploadProgressDialog.setCancelable(true);
+        uploadProgressDialog.setCancelable(false);
         uploadProgressDialog.create();
         uploadProgressDialog.show();
         Uri uri=Uri.fromFile(new File(fileName));
@@ -175,7 +174,6 @@ public class SendMessage extends AppCompatActivity {
                         audioUri=uri.toString();
                     }
                     sendVoiceIb.setEnabled(true);
-                    sendMessageBn.setEnabled(true);
                     uploadProgressDialog.dismiss();
                 }
             }
@@ -184,7 +182,7 @@ public class SendMessage extends AppCompatActivity {
             public void onFailure(@NonNull Exception e) {
                 sendVoiceIb.setEnabled(true);
                 uploadProgressDialog.dismiss();
-                Toast.makeText(SendMessage.this, "voice upload failure"+e.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(SendMessageActivity.this, "voice upload failure"+e.getMessage(), Toast.LENGTH_SHORT).show();
 
             }
         });

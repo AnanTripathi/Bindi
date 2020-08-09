@@ -89,8 +89,9 @@ public class UpdateUserActivity extends AppCompatActivity {
 
     //for image
     StorageReference storageReference;
+    String audioStoragePath="User_Profile_Cover_Voice/";
     String storagePath = "User_Profile_Cover_Images/";
-
+    private Boolean startPlaying=true;
     private static final int CAMERA_REQUEST_CODE = 100;
     private static final int STORAGE_REQUEST_CODE = 200;
     private static final int IMAGE_PICK_GALLERY_CODE = 300;
@@ -103,13 +104,13 @@ public class UpdateUserActivity extends AppCompatActivity {
     Button editVoiceButton;
     String voiceUri="";
     FloatingActionButton playVoiceButton;
-    private Toolbar toolbar;
+    private MediaPlayer mediaPlayer=null;
     private String [] audioPermission = {Manifest.permission.RECORD_AUDIO,Manifest.permission.WRITE_EXTERNAL_STORAGE};
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_update_user);
-        toolbar=findViewById(R.id.app_bar);
+
         imageView=findViewById(R.id.profileImage);
         profileImageHolderCard=findViewById(R.id.profileImageHolder);
         try{
@@ -261,11 +262,13 @@ public class UpdateUserActivity extends AppCompatActivity {
                     if (userdata.getImage()!=null&&!userdata.getImage().equals("")) {
 
                         imageProgressBar.setVisibility(View.VISIBLE);
+
+                       // GlideDrawableImageViewTarget imageViewTarget = new GlideDrawableImageViewTarget(imageView, LOOP_COUNT);
                         Glide.with(UpdateUserActivity.this)
                                 .load(userdata.getImage())
                                 .error(R.drawable.broken_image_black)
                                 .fallback(R.drawable.broken_image_black)
-                                .transition(DrawableTransitionOptions.withCrossFade())
+                                .placeholder(R.drawable.loadinggif)
                                 .into(imageView);
                         save.setEnabled(true);
                     }
@@ -318,31 +321,8 @@ public class UpdateUserActivity extends AppCompatActivity {
         playVoiceButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (userdata != null && userdata.getAudio() != null && !userdata.getAudio().equals("")) {
-                    Uri myUri = Uri.parse(userdata.getAudio()); // initialize Uri here
-                    MediaPlayer mediaPlayer = new MediaPlayer();
-                    mediaPlayer.setAudioAttributes(
-                            new AudioAttributes.Builder()
-                                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                                    .setUsage(AudioAttributes.USAGE_MEDIA)
-                                    .build()
-                    );
-                    try {
-                        mediaPlayer.setDataSource(getApplicationContext(), myUri);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    try {
-                        mediaPlayer.prepare();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    mediaPlayer.start();
-
-                }
-                else{
-                    Toast.makeText(UpdateUserActivity.this, "Please update the audio first", Toast.LENGTH_SHORT).show();
-                }
+                onPlay(startPlaying);
+                startPlaying = !startPlaying;
                 
             }
         });
@@ -363,6 +343,17 @@ public class UpdateUserActivity extends AppCompatActivity {
                 if(mBottomSheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED){
                     mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
                 } else {
+                    mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                }
+            }
+        });
+        arrowIbSheet.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(isRecordBottonPressed){
+                    Toast.makeText(UpdateUserActivity.this, "Please close the recording first", Toast.LENGTH_SHORT).show();
+                }
+                else {
                     mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                 }
             }
@@ -391,7 +382,66 @@ public class UpdateUserActivity extends AppCompatActivity {
             }
         });
     }
+    private void onPlay(boolean start) {
+        if (start) {
+            startPlaying();
+        } else {
+            stopPlaying();
+        }
+    }
+    private void startPlaying() {
+        progressBar.setVisibility(View.VISIBLE);
+        new Thread(new Runnable() {
+            public void run() {
 
+
+                if (userdata != null && userdata.getAudio() != null && !userdata.getAudio().equals("")) {
+                    Uri myUri = Uri.parse(userdata.getAudio()); // initialize Uri here
+                    mediaPlayer = new MediaPlayer();
+                    mediaPlayer.setAudioAttributes(
+                            new AudioAttributes.Builder()
+                                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                                    .build()
+                    );
+                    try {
+                        mediaPlayer.setDataSource(getApplicationContext(), myUri);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        mediaPlayer.prepare();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    mediaPlayer.start();
+                    runOnUiThread(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            progressBar.setVisibility(View.GONE);
+                        }
+                    });
+
+                } else {
+                    runOnUiThread(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            progressBar.setVisibility(View.GONE);
+                        }
+                    });
+                    Toast.makeText(UpdateUserActivity.this, "Please update the audio first", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }).start();
+    }
+
+    private void stopPlaying() {
+        if(mediaPlayer!=null&&mediaPlayer.isPlaying()){
+            mediaPlayer.release();
+            mediaPlayer = null;}
+    }
     private void recieveIntent() {
 //        ActionBar actionBar=getSupportActionBar();
 //        if (actionBar != null) {
@@ -576,7 +626,7 @@ public class UpdateUserActivity extends AppCompatActivity {
             case STORAGE_REQUEST_CODE:{
                 if(grantResults.length>0){
                     //  boolean cameraAccepted=grantResults[0]==PackageManager.PERMISSION_GRANTED;
-                    boolean writeStorageAccepted=grantResults[1]==PackageManager.PERMISSION_GRANTED;
+                    boolean writeStorageAccepted=grantResults[0]==PackageManager.PERMISSION_GRANTED;
                     if( writeStorageAccepted){
                         //permission enable
                         pickFromGallery();
@@ -629,7 +679,7 @@ public class UpdateUserActivity extends AppCompatActivity {
         uploadProgressDialog.create();
         uploadProgressDialog.show();
         Uri uri=Uri.fromFile(new File(fileName));
-        String filePathAndName=storagePath+"profile_"+firebaseAuth.getUid();
+        String filePathAndName=audioStoragePath+"audio_"+firebaseAuth.getUid();
         StorageReference storageReference2nd= FirebaseStorage.getInstance().getReference().child(filePathAndName);
         storageReference2nd.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override

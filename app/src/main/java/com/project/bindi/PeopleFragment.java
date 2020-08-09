@@ -1,32 +1,21 @@
 package com.project.bindi;
 
-import android.content.Context;
 import android.content.Intent;
-import android.media.MediaPlayer;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.core.view.GestureDetectorCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.RecyclerView.Adapter;
 
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.LinearInterpolator;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.dialog.MaterialDialogs;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -34,7 +23,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.yuyakaido.android.cardstackview.CardStackLayoutManager;
 import com.yuyakaido.android.cardstackview.CardStackListener;
@@ -44,20 +32,12 @@ import com.yuyakaido.android.cardstackview.StackFrom;
 import com.yuyakaido.android.cardstackview.SwipeableMethod;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
 
 public class PeopleFragment extends Fragment {
-
-
-
-    //List of info of all users
     ArrayList<User> allUserInfo;
     FloatingActionButton rewindFab,likeFab,dislikeFab,doubleLikeFab;
     CardStackView cardStackView;
-    ShowAllUser showAllUserAdapter;
     private static final String TAG = PeopleFragment.class.getSimpleName();
     private CardStackLayoutManager manager;
     private CardStackAdapter adapter;
@@ -88,7 +68,7 @@ public class PeopleFragment extends Fragment {
                     User user1=ds.getValue(User.class);
                     if(user1.isProfileComplete()) {
                         if (!(user1.getUid().equals(Firebaseuser.getUid()))) {
-                            if(user1.getGender().equals(DashBoardActivity.loggedInUser.getInterestedin())){
+                            if(DashBoardActivity.loggedInUser.getInterestedin().equals("Both")||user1.getGender().equals(DashBoardActivity.loggedInUser.getInterestedin())){
                             allUserInfo.add(user1);
                             if (allUserInfo.size() == 1) {
                                 adapter = new CardStackAdapter(getContext(), allUserInfo);
@@ -147,6 +127,11 @@ public class PeopleFragment extends Fragment {
 
             @Override
             public void onCardSwiped(Direction direction) {
+                if(CardStackAdapter.mediaPlayer!=null&&CardStackAdapter.mediaPlayer.isPlaying()){
+                    CardStackAdapter.mediaPlayer.release();
+                    CardStackAdapter.mediaPlayer = null;
+                }
+
                 Log.d(TAG, "onCardSwiped: p=" + manager.getTopPosition() + " d=" + direction);
                 if (direction == Direction.Right) {
                     likeThePerson();
@@ -249,7 +234,7 @@ public class PeopleFragment extends Fragment {
                 Toast.makeText(getActivity(), "you double liked "+ allUserInfo.get(topPosition).getName(), Toast.LENGTH_SHORT).show();
             }
         });
-        Intent intent=new Intent(getActivity(),SendMessage.class);
+        Intent intent=new Intent(getActivity(), SendMessageActivity.class);
         intent.putExtra("toId",allUserInfo.get(topPosition).getUid());
         startActivity(intent);
       //  Objects.requireNonNull(getActivity()).finish();

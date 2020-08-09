@@ -3,6 +3,7 @@ package com.project.bindi;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.content.Intent;
@@ -32,6 +33,11 @@ public class DashBoardActivity extends AppCompatActivity {
     static public User loggedInUser;
     private DatabaseReference usersDatabaseReference;
     private static final String TAG = "DashBoardActivity";
+    PeopleFragment fragment1;
+    FragmentTransaction ft;
+    VoiceMailsFragment fragment2;
+    ProfileFragment fragment3;
+    FragmentManager fm;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,10 +51,25 @@ public class DashBoardActivity extends AppCompatActivity {
         BottomNavigationView bottomNavigationView=findViewById(R.id.navigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(selectedlistener);
 
-        PeopleFragment fragment1=new PeopleFragment();
-        FragmentTransaction ft1=getSupportFragmentManager().beginTransaction();
-        ft1.replace(R.id.content,fragment1,"");
-        ft1.commit();
+        if(fm==null){
+        fm=getSupportFragmentManager();
+
+            if(fm.findFragmentByTag("one") != null) {
+                //if the fragment exists, show it.
+                fm.beginTransaction().show(fm.findFragmentByTag("one")).commit();
+            } else {
+                //if the fragment does not exist, add it to fragment manager.
+                fm.beginTransaction().add(R.id.content, new PeopleFragment(), "one").commit();
+            }
+            if(fm.findFragmentByTag("two") != null){
+                //if the other fragment is visible, hide it.
+                fm.beginTransaction().hide(fm.findFragmentByTag("two")).commit();
+            }
+            if(fm.findFragmentByTag("three") != null){
+                //if the other fragment is visible, hide it.
+                fm.beginTransaction().hide(fm.findFragmentByTag("three")).commit();
+            }
+        }
 
         final Query userQuery = usersDatabaseReference.orderByChild("uid").equalTo(firebaseAuth.getUid());
         userQuery.addValueEventListener(new ValueEventListener() {
@@ -75,24 +96,57 @@ public class DashBoardActivity extends AppCompatActivity {
                     switch (item.getItemId()){
                         case R.id.nav_people:
                             actionBar.setTitle("People");
-                            PeopleFragment fragment1=new PeopleFragment();
-                            FragmentTransaction ft1=getSupportFragmentManager().beginTransaction();
-                            ft1.replace(R.id.content,fragment1,"");
-                            ft1.commit();
+                            if(fm.findFragmentByTag("one") != null) {
+                                //if the fragment exists, show it.
+                                fm.beginTransaction().show(fm.findFragmentByTag("one")).commit();
+                            } else {
+                                //if the fragment does not exist, add it to fragment manager.
+                                fm.beginTransaction().add(R.id.content, new PeopleFragment(), "one").commit();
+                            }
+                            if(fm.findFragmentByTag("two") != null){
+                                //if the other fragment is visible, hide it.
+                                fm.beginTransaction().hide(fm.findFragmentByTag("two")).commit();
+                            }
+                            if(fm.findFragmentByTag("three") != null){
+                                //if the other fragment is visible, hide it.
+                                fm.beginTransaction().hide(fm.findFragmentByTag("three")).commit();
+                            }
                             return true;
                         case R.id.nav_voice_mails:
                             actionBar.setTitle("Voice Messages");
-                            VoiceMailsFragment fragment2=new VoiceMailsFragment();
-                            FragmentTransaction ft2=getSupportFragmentManager().beginTransaction();
-                            ft2.replace(R.id.content,fragment2,"");
-                            ft2.commit();
+                            if(fm.findFragmentByTag("two") != null) {
+                                //if the fragment exists, show it.
+                                fm.beginTransaction().show(fm.findFragmentByTag("two")).commit();
+                            } else {
+                                //if the fragment does not exist, add it to fragment manager.
+                                fm.beginTransaction().add(R.id.content, new VoiceMailsFragment(), "two").commit();
+                            }
+                            if(fm.findFragmentByTag("one") != null){
+                                //if the other fragment is visible, hide it.
+                                fm.beginTransaction().hide(fm.findFragmentByTag("one")).commit();
+                            }
+                            if(fm.findFragmentByTag("three") != null){
+                                //if the other fragment is visible, hide it.
+                                fm.beginTransaction().hide(fm.findFragmentByTag("three")).commit();
+                            }
                             return true;
                         case R.id.nav_profile:
                             actionBar.setTitle("Profile");
-                            ProfileFragment fragment3=new ProfileFragment();
-                            FragmentTransaction ft3=getSupportFragmentManager().beginTransaction();
-                            ft3.replace(R.id.content,fragment3,"");
-                            ft3.commit();
+                            if(fm.findFragmentByTag("three") != null) {
+                                //if the fragment exists, show it.
+                                fm.beginTransaction().show(fm.findFragmentByTag("three")).commit();
+                            } else {
+                                //if the fragment does not exist, add it to fragment manager.
+                                fm.beginTransaction().add(R.id.content, new ProfileFragment(), "three").commit();
+                            }
+                            if(fm.findFragmentByTag("one") != null){
+                                //if the other fragment is visible, hide it.
+                                fm.beginTransaction().hide(fm.findFragmentByTag("one")).commit();
+                            }
+                            if(fm.findFragmentByTag("two") != null){
+                                //if the other fragment is visible, hide it.
+                                fm.beginTransaction().hide(fm.findFragmentByTag("two")).commit();
+                            }
                             return true;
                     }
                     return false;

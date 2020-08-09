@@ -1,14 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:layout_margin="10dp"
     tools:context=".VoiceMailsFragment">
-
-    <!-- TODO: Update blank fragment layout -->
     <TextView
+        android:textColor="@color/colorBlack"
+        android:layout_margin="5dp"
+        android:textSize="20sp"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Sent Messages" />
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+        <ImageView
+            android:id="@+id/emptySentIv"
+            android:scaleType="centerCrop"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/emptyrecieved"/>
+        <TextView
+            android:layout_margin="10dp"
+            android:id="@+id/emptySentTextview"
+            android:gravity="center"
+            android:textColor="#fff"
+            android:textSize="30sp"
+            android:text="Swipe up the profile image to message someone"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/sentRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
+    </FrameLayout>
+    <TextView
+        android:textColor="@color/colorBlack"
+        android:layout_margin="5dp"
+        android:textSize="20sp"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Received Messages" />
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+        <ImageView
+            android:id="@+id/emptyRecievedIv"
+            android:scaleType="centerCrop"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/emptyrecieved"/>
+        <TextView
+            android:id="@+id/emptyRecievedTextview"
+            android:gravity="center"
+            android:textColor="#fff"
+            android:textSize="40sp"
+            android:layout_margin="10dp"
+            android:text="Someone will soon message you"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/receivedRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
-
-</FrameLayout>
+      />
+    </FrameLayout>
+</LinearLayout>

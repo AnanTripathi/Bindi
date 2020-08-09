@@ -6,13 +6,15 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:elevation="10dp"
-    android:background="#ffffff"
+
     app:behavior_hideable="true"
     app:behavior_peekHeight="0dp"
+
     app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
     app:cardCornerRadius="20dp"
     >
     <RelativeLayout
+        android:background="#D3D3D3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <ImageButton
@@ -22,8 +24,8 @@
             android:backgroundTint="#FFFF00"
             android:background="@drawable/custom_design_fab_background"
             android:src="@drawable/arrow_up"
-            android:layout_width="30dp"
-            android:layout_height="30dp"/>
+            android:layout_width="40dp"
+            android:layout_height="40dp"/>
     <ImageButton
         android:layout_margin="20dp"
         android:id="@+id/recordfabIb"
