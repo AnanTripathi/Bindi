@@ -32,6 +32,7 @@ import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
+import static com.project.bindi.VoiceMailsFragment.isButtonClicked;
 import static com.project.bindi.VoiceMailsFragment.mediaPlayer;
 import static com.project.bindi.VoiceMailsFragment.startPlaying;
 
@@ -70,9 +71,12 @@ public class ReceivedMessageAdapter extends RecyclerView.Adapter<ReceivedMessage
                     holder.playIb.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            onPlay(startPlaying,holder.progressBar,sender);
-                            startPlaying = !startPlaying;
+                            if(!isButtonClicked){
+                                onPlay(startPlaying,holder.progressBar,message);
+                                startPlaying = !startPlaying;}
+                            isButtonClicked=!isButtonClicked;
                         }
+
                     });
                     holder.nameTv.setText(sender.getName());
                     holder.messageTv.setText(message.getMessage());
@@ -98,25 +102,26 @@ public class ReceivedMessageAdapter extends RecyclerView.Adapter<ReceivedMessage
             }
         });
     }
-    private void onPlay(boolean start,ProgressBar progressBar,User userdata) {
+    private void onPlay(boolean start,ProgressBar progressBar,Message message) {
         if (start) {
-            startPlaying(progressBar,userdata);
+            startPlaying(progressBar,message);
         } else {
             stopPlaying();
         }
     }
-    private void startPlaying(final ProgressBar progressBar, final User userdata) {
+    private void startPlaying(final ProgressBar progressBar, final Message message) {
         progressBar.setVisibility(View.VISIBLE);
         new Thread(new Runnable() {
             public void run() {
 
 
-                if (userdata != null && userdata.getAudio() != null && !userdata.getAudio().equals("")) {
-                    Uri myUri = Uri.parse(userdata.getAudio()); // initialize Uri here
+                if (message != null && message.getVoiceMessageLink() != null && !message.getVoiceMessageLink().equals("")) {
+                    Uri myUri = Uri.parse(message.getVoiceMessageLink()); // initialize Uri here
                     mediaPlayer = new MediaPlayer();
                     mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                         @Override
                         public void onCompletion(MediaPlayer mp) {
+                            isButtonClicked=!isButtonClicked;
                             startPlaying=!startPlaying;
                             mp.release();
                         }
@@ -148,6 +153,7 @@ public class ReceivedMessageAdapter extends RecyclerView.Adapter<ReceivedMessage
                         }
                     });
                 } else {
+                    isButtonClicked=!isButtonClicked;
                     DashBoardActivity d=(DashBoardActivity) context;
                     d.runOnUiThread(new Runnable() {
 

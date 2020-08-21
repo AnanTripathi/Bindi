@@ -89,16 +89,8 @@ public class SendMessageActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 uploadAudio();
-                if(messageEt.getText().toString().trim().equals("")){
-                    messageTil.setFocusable(View.FOCUSABLE);
-                    Toast.makeText(SendMessageActivity.this, "Please write a message", Toast.LENGTH_SHORT).show();
-                }
-                else{
-                    Message message=new Message(firebaseAuth.getUid()+recieverId,firebaseAuth.getUid(),recieverId,messageEt.getText().toString().trim(),audioUri);
-                    DatabaseReference messageDatabaseReference=FirebaseDatabase.getInstance().getReference(Message.parentLocation);
-                    messageDatabaseReference.child(message.getMessageId()).setValue(message);
-                }
-                startActivity(new Intent(SendMessageActivity.this,DashBoardActivity.class));
+
+                //startActivity(new Intent(SendMessageActivity.this,DashBoardActivity.class));
             }
         });
     }
@@ -161,7 +153,7 @@ public class SendMessageActivity extends AppCompatActivity {
         uploadProgressDialog.create();
         uploadProgressDialog.show();
         Uri uri=Uri.fromFile(new File(fileName));
-        String filePathAndName=Message.parentLocation+"/message_"+firebaseAuth.getUid();
+        String filePathAndName=Message.parentLocation+"/message_"+firebaseAuth.getUid()+recieverId;
         StorageReference storageReference2nd= FirebaseStorage.getInstance().getReference().child(filePathAndName);
         storageReference2nd.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
@@ -175,6 +167,26 @@ public class SendMessageActivity extends AppCompatActivity {
                     }
                     sendVoiceIb.setEnabled(true);
                     uploadProgressDialog.dismiss();
+                    if(messageEt.getText().toString().trim().equals("")||audioUri.equals("")){
+                        messageTil.setFocusable(View.FOCUSABLE);
+                        Toast.makeText(SendMessageActivity.this, "Please write a message and save a voice", Toast.LENGTH_SHORT).show();
+                    }
+                    else{
+                        Message message=new Message(firebaseAuth.getUid()+recieverId,firebaseAuth.getUid(),recieverId,messageEt.getText().toString().trim(),audioUri);
+                        DatabaseReference messageDatabaseReference=FirebaseDatabase.getInstance().getReference(Message.parentLocation);
+                        messageDatabaseReference.child(message.getMessageId()).setValue(message).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                finish();
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Toast.makeText(SendMessageActivity.this, "Network error try again", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
+                    }
                 }
             }
         }).addOnFailureListener(new OnFailureListener() {

@@ -16,7 +16,7 @@
         android:theme="@style/AppTheme">
         <activity android:name=".SendMessageActivity"></activity>
         <activity android:name=".RegisterActivity" />
-        
+
         <activity android:name=".LoginActivity"></activity>
         <activity android:name=".UpdateUserActivity" />
         <activity android:name=".DashBoardActivity">

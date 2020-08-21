@@ -38,6 +38,7 @@ SentMessageAdapter sentMessageAdapter;
 ReceivedMessageAdapter receivedMessageAdapter;
 DatabaseReference messageDatabaseReference;
 FirebaseAuth firebaseAuth;
+public  static boolean isButtonClicked=false;
 ArrayList<Message> sentMessageArrayList=new ArrayList<>(),receivedMessageArrayList=new ArrayList<>();
 TextView emptySentTextView,emptyReceivedTextView;
 ImageView emptyReceivedImageView,emptySentImageView;
