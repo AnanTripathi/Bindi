@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 
@@ -11,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
 import android.view.animation.LinearInterpolator;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,7 +30,9 @@ import com.yuyakaido.android.cardstackview.CardStackLayoutManager;
 import com.yuyakaido.android.cardstackview.CardStackListener;
 import com.yuyakaido.android.cardstackview.CardStackView;
 import com.yuyakaido.android.cardstackview.Direction;
+import com.yuyakaido.android.cardstackview.Duration;
 import com.yuyakaido.android.cardstackview.StackFrom;
+import com.yuyakaido.android.cardstackview.SwipeAnimationSetting;
 import com.yuyakaido.android.cardstackview.SwipeableMethod;
 
 import java.util.ArrayList;
@@ -47,6 +51,7 @@ public class PeopleFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         final View view=inflater.inflate(R.layout.fragment_people, container, false);
+
         usersDatabaseReference=FirebaseDatabase.getInstance().getReference("Users");
         rewindFab=view.findViewById(R.id.lastFab);
         likeFab=view.findViewById(R.id.likeFab);
@@ -88,6 +93,21 @@ public class PeopleFragment extends Fragment {
 
             }
         });
+        final SwipeAnimationSetting left= new SwipeAnimationSetting.Builder()
+                .setDirection(Direction.Left)
+                .setDuration(Duration.Normal.duration)
+                .setInterpolator(new AccelerateInterpolator())
+                .build();
+        final SwipeAnimationSetting right= new SwipeAnimationSetting.Builder()
+                .setDirection(Direction.Right)
+                .setDuration(Duration.Normal.duration)
+                .setInterpolator(new AccelerateInterpolator())
+                .build();
+        final SwipeAnimationSetting up= new SwipeAnimationSetting.Builder()
+                .setDirection(Direction.Top)
+                .setDuration(Duration.Normal.duration)
+                .setInterpolator(new AccelerateInterpolator())
+                .build();
     rewindFab.setOnClickListener(new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -97,22 +117,25 @@ public class PeopleFragment extends Fragment {
     likeFab.setOnClickListener(new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+            manager.setSwipeAnimationSetting(right);
             cardStackView.swipe();
-            likeThePerson();
+
         }
     });
     dislikeFab.setOnClickListener(new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+
+            manager.setSwipeAnimationSetting(left);
             cardStackView.swipe();
-            dislikeThePerson();
         }
     });
     doubleLikeFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                manager.setSwipeAnimationSetting(up);
                 cardStackView.swipe();
-                doubleLikeThePerson();
             }
         });
         return view;
@@ -211,6 +234,7 @@ public class PeopleFragment extends Fragment {
     }
 
     private void likeThePerson() {
+
         final int topPosition=manager.getTopPosition()-1;
         allUserInfo.get(topPosition).increaseLikes();
         HashMap<String, Object> results = new HashMap<>();
@@ -218,7 +242,6 @@ public class PeopleFragment extends Fragment {
         usersDatabaseReference.child(allUserInfo.get(topPosition).getUid()).updateChildren(results).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
-
                 Toast.makeText(getActivity(), "you liked "+ allUserInfo.get(topPosition).getName(), Toast.LENGTH_SHORT).show();
             }
         });
